@@ -115,7 +115,7 @@ PlayerUnit.prototype.onMovementPossibleCircleClicked = function(circle){
 		if(merged){
 			return;
 		}
-		if(unit.x == circle.x && unit.y == circle.y && unit.owner == circle.unit.owner){
+		if(unit.x_ == circle.x && unit.y_ == circle.y && unit.owner == circle.unit.owner){
 			unit.mergeWith(circle.unit);
 			merged = true;
 		}

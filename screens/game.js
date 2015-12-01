@@ -26,26 +26,43 @@ preload: function() {
     game.load.image('map', 'assets/tiles/tilemap.png');
     game.load.image('arrow_h', 'assets/sprites/arrow_h.png');
     game.load.image('arrow_v', 'assets/sprites/arrow_v.png');
+    game.load.image('player_unit', 'assets/sprites/player_unit.png');
+    game.load.image('player_unit_2', 'assets/sprites/player_unit_2.png');
     game.load.tilemap('level_'+levelNumber.toString(), 'assets/maps/'+levelNumber+'.json', null, Phaser.Tilemap.TILED_JSON);
 
     // Load things..
 },
 create: function() {
 
+    game.currentPlayer1P = true;
+
     this.pieProgressPie.DestroyPie();
     this.pieProgressPie = null;
 
     // Create things...
-    this.menuText = game.add.text(game.width - 20, game.height - 5, "Al Menu", { font: "bold 34px Arial", fill: "#FFFFFF" });
-    this.menuText.anchor.set(1.0);
+    this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
+
+    this.menuText = game.add.text(game.width - 20, 5, "Al Menu", { font: "bold 34px Arial", fill: "#FFFFFF" });
+    this.menuText.anchor.set(1.0,0.0);
     this.menuText.fixedToCamera = true;
     this.menuText.stroke =  'black';
     this.menuText.strokeThickness=2;
-
-    this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
-
     this.menuText.inputEnabled = true;
     this.menuText.events.onInputDown.add(this.toMenu, this);
+
+    this.finishTurnText = game.add.text(game.width - 20, game.height - 5, "Finalizar turno", { font: "bold 34px Arial", fill: "#FFFFFF" });
+    this.finishTurnText.anchor.set(1.0);
+    this.finishTurnText.fixedToCamera = true;
+    this.finishTurnText.stroke =  'black';
+    this.finishTurnText.strokeThickness=2;
+    this.finishTurnText.inputEnabled = true;
+    this.finishTurnText.events.onInputDown.add(this.finishTurn, this);
+
+    this.currentTurnText = game.add.text(game.width - 20, game.height - 40, "", { font: "bold 24px Arial", fill: "#FFFFFF" });
+    this.currentTurnText.anchor.set(1.0);
+    this.currentTurnText.fixedToCamera = true;
+    this.currentTurnText.stroke =  'black';
+    this.currentTurnText.strokeThickness=2;
 
     this.map = game.add.tilemap('level_'+levelNumber.toString());
     this.map.addTilesetImage('map');
@@ -85,6 +102,15 @@ create: function() {
     this.rightArrow.inputEnabled = true;
     this.rightArrow.events.onInputDown.add(this.rightArrowPressed, this);
 
+    this.game_ui_group = game.add.group();
+    this.game_ui_group.add(this.upArrow);
+    this.game_ui_group.add(this.downArrow);
+    this.game_ui_group.add(this.leftArrow);
+    this.game_ui_group.add(this.rightArrow);
+    this.game_ui_group.add(this.menuText);
+    this.game_ui_group.add(this.finishTurnText);
+    this.game_ui_group.add(this.currentTurnText);
+
     game.camera.x = 0;
     game.camera.y = 5 * 64;
 
@@ -94,15 +120,42 @@ create: function() {
     this.cursors.left.onDown.add(this.leftArrowPressed, this);
     this.cursors.right.onDown.add(this.rightArrowPressed, this);
 
-    game.world.bringToTop(this.menuText);
+    this.unitsGroup = new UnitsGroup(game,this.map,this.layer);
+    this.unitsGroup.createPlayerUnit(game,2,7,1);
+    this.unitsGroup.createPlayerUnit(game,2,8,1);
+    this.unitsGroup.createPlayerUnit(game,2,9,1);
+
+    this.unitsGroup.createPlayerUnit(game,12,7,2);
+    this.unitsGroup.createPlayerUnit(game,12,8,2);
+    this.unitsGroup.createPlayerUnit(game,12,9,2);
+
+    this.updateCurrentTurnText();
 
 },
 update: function() {
     if(game.isGamepaused){
         return;
     }
-
+    game.world.bringToTop(this.game_ui_group);
     // Update things ...
+},
+updateCurrentTurnText: function(){
+    if(game.currentPlayer1P){
+        this.currentTurnText.text = "Turno jugador 1";
+    }
+    else{
+        this.currentTurnText.text = "Turno jugador 2";
+    }
+},
+tweenToCurrentCastlePlayer: function(){
+    if(game.currentPlayer1P){
+        this.game.add.tween(this.game.camera).to( {x: 0,y: 5 * 64}
+            , 300, Phaser.Easing.Quadratic.InOut, true);
+    }
+    else{
+        this.game.add.tween(this.game.camera).to( {x: 14*64,y: 5 * 64}
+            , 300, Phaser.Easing.Quadratic.InOut, true);
+    }
 },
 upArrowPressed: function(){
     fx.play('button_click');
@@ -136,6 +189,13 @@ rightArrowPressed: function(){
         this.game.add.tween(this.game.camera).to( {x: game.camera.x + 64}
             , 100, Phaser.Easing.Quadratic.InOut, true);
     }
+},
+finishTurn: function(){
+    fx.play('button_click');
+    this.unitsGroup.finishTurn();
+    game.currentPlayer1P = !game.currentPlayer1P;
+    this.updateCurrentTurnText();
+    this.tweenToCurrentCastlePlayer();
 },
 toMenu: function(){
     fx.play('button_click');

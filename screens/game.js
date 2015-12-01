@@ -28,6 +28,7 @@ preload: function() {
     game.load.image('arrow_v', 'assets/sprites/arrow_v.png');
     game.load.image('player_unit', 'assets/sprites/player_unit.png');
     game.load.image('player_unit_2', 'assets/sprites/player_unit_2.png');
+    game.load.image('capture_tile', 'assets/sprites/capture_tile.png');
     game.load.tilemap('level_'+levelNumber.toString(), 'assets/maps/'+levelNumber+'.json', null, Phaser.Tilemap.TILED_JSON);
 
     // Load things..
@@ -57,6 +58,12 @@ create: function() {
     this.finishTurnText.strokeThickness=2;
     this.finishTurnText.inputEnabled = true;
     this.finishTurnText.events.onInputDown.add(this.finishTurn, this);
+
+    this.captureStatsText = game.add.text(game.width - 20, game.height - 70, "1P: 0 2P: 0", { font: "bold 24px Arial", fill: "#FFFFFF" });
+    this.captureStatsText.anchor.set(1.0);
+    this.captureStatsText.fixedToCamera = true;
+    this.captureStatsText.stroke =  'black';
+    this.captureStatsText.strokeThickness=2;
 
     this.currentTurnText = game.add.text(game.width - 20, game.height - 40, "", { font: "bold 24px Arial", fill: "#FFFFFF" });
     this.currentTurnText.anchor.set(1.0);
@@ -110,6 +117,7 @@ create: function() {
     this.game_ui_group.add(this.menuText);
     this.game_ui_group.add(this.finishTurnText);
     this.game_ui_group.add(this.currentTurnText);
+    this.game_ui_group.add(this.captureStatsText);
 
     game.camera.x = 0;
     game.camera.y = 5 * 64;
@@ -120,7 +128,9 @@ create: function() {
     this.cursors.left.onDown.add(this.leftArrowPressed, this);
     this.cursors.right.onDown.add(this.rightArrowPressed, this);
 
+    this.captureGroup = new CaptureGroup(game,this.map,this.layer);
     this.unitsGroup = new UnitsGroup(game,this.map,this.layer);
+    
     this.unitsGroup.createPlayerUnit(game,2,7,1);
     this.unitsGroup.createPlayerUnit(game,2,8,1);
     this.unitsGroup.createPlayerUnit(game,2,9,1);
@@ -129,8 +139,13 @@ create: function() {
     this.unitsGroup.createPlayerUnit(game,12,8,2);
     this.unitsGroup.createPlayerUnit(game,12,9,2);
 
+    this.processCapture();
     this.updateCurrentTurnText();
+    this.updateCaptureStats();
 
+    // Create cameras
+    this.camera1P = new Phaser.Point(0,5*64);
+    this.camera2P = new Phaser.Point(14*64,5*64);
 },
 update: function() {
     if(game.isGamepaused){
@@ -147,13 +162,26 @@ updateCurrentTurnText: function(){
         this.currentTurnText.text = "Turno jugador 2";
     }
 },
+updateCaptureStats: function(){
+    capture1P = 0;
+    capture2P = 0;
+    this.captureGroup.forEach(function(capture){
+        if(capture.owner == 1){
+            capture1P++;
+        }
+        else{
+            capture2P++;
+        }
+    });
+    this.captureStatsText.text = "1P: "+capture1P+" 2P: "+capture2P;
+},
 tweenToCurrentCastlePlayer: function(){
     if(game.currentPlayer1P){
-        this.game.add.tween(this.game.camera).to( {x: 0,y: 5 * 64}
+        this.game.add.tween(this.game.camera).to( {x: this.camera1P.x,y: this.camera1P.y}
             , 300, Phaser.Easing.Quadratic.InOut, true);
     }
     else{
-        this.game.add.tween(this.game.camera).to( {x: 14*64,y: 5 * 64}
+        this.game.add.tween(this.game.camera).to( {x: this.camera2P.x,y: this.camera2P.y}
             , 300, Phaser.Easing.Quadratic.InOut, true);
     }
 },
@@ -163,6 +191,12 @@ upArrowPressed: function(){
         //game.camera.y -= 64;
         this.game.add.tween(this.game.camera).to( {y: game.camera.y - 64}
             , 100, Phaser.Easing.Quadratic.InOut, true);
+        if(game.currentPlayer1P){
+            this.camera1P.y = game.camera.y - 64;
+        }
+        else{
+            this.camera2P.y = game.camera.y - 64;
+        }
     }
 
 },
@@ -172,6 +206,12 @@ downArrowPressed: function(){
         //game.camera.y += 64;
         this.game.add.tween(this.game.camera).to( {y: game.camera.y + 64}
             , 100, Phaser.Easing.Quadratic.InOut, true);
+        if(game.currentPlayer1P){
+            this.camera1P.y = game.camera.y + 64;
+        }
+        else{
+            this.camera2P.y = game.camera.y + 64;
+        }
     }
 },
 leftArrowPressed: function(){
@@ -180,6 +220,12 @@ leftArrowPressed: function(){
         //game.camera.x -= 64;
         this.game.add.tween(this.game.camera).to( {x: game.camera.x - 64}
             , 100, Phaser.Easing.Quadratic.InOut, true);
+         if(game.currentPlayer1P){
+            this.camera1P.x = game.camera.x - 64;
+        }
+        else{
+            this.camera2P.x = game.camera.x - 64;
+        }
     }
 },
 rightArrowPressed: function(){
@@ -188,13 +234,21 @@ rightArrowPressed: function(){
         //game.camera.x += 64;
         this.game.add.tween(this.game.camera).to( {x: game.camera.x + 64}
             , 100, Phaser.Easing.Quadratic.InOut, true);
+        if(game.currentPlayer1P){
+            this.camera1P.x = game.camera.x + 64;
+        }
+        else{
+            this.camera2P.x = game.camera.x + 64;
+        }
     }
 },
 finishTurn: function(){
     fx.play('button_click');
+    this.processCapture();
     this.unitsGroup.finishTurn();
     game.currentPlayer1P = !game.currentPlayer1P;
     this.updateCurrentTurnText();
+    this.updateCaptureStats();
     this.tweenToCurrentCastlePlayer();
 },
 toMenu: function(){
@@ -208,6 +262,30 @@ toGame: function(){
     //Para reintentar
     // Reset things...
     game.state.start('Game');
+},
+processCapture: function(){
+    that = this;
+    this.unitsGroup.forEach(function(unit){
+        uncaptured_zone = true;
+        that.captureGroup.forEach(function(capture){
+            if(capture.x - 32 == unit.x_ && capture.y - 32 == unit.y_){
+                uncaptured_zone = false;
+                if(capture.owner == unit.owner){
+                    // nada pasa
+                    uncaptured_zone = false;
+                }
+                else{
+                    // recaptura
+                    capture.destroy();
+                    that.captureGroup.createCaptureTile(game,unit.x_/64,unit.y_/64,unit.owner);
+                }
+            }
+        });
+        if(uncaptured_zone){
+            // captura
+            that.captureGroup.createCaptureTile(game,unit.x_/64,unit.y_/64,unit.owner);
+        }
+    });
 },
 muteGame: function(){
     game.sound.mute = !game.sound.mute;

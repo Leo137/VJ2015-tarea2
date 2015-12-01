@@ -6,7 +6,7 @@ var PlayerUnit = function(game, mapx, mapy, map, layer, group, owner){
     	Phaser.Sprite.call(this, game, mapx * 64, mapy *64, 'player_unit_2');
     }
     this.anchor.setTo(0.0);
-    game.physics.enable(this, Phaser.Physics.ARCADE);
+    this.scale.setTo(0.8);
     this.inputEnabled = true;
     this.events.onInputDown.add(this.onUnitClicked,this);
     this.map = map;
@@ -20,6 +20,13 @@ var PlayerUnit = function(game, mapx, mapy, map, layer, group, owner){
     this.quantityText.anchor.setTo(0.0);
     this.quantityText.stroke =  'black';
     this.quantityText.strokeThickness=2;
+    this.x_ = this.x;
+    this.y_ = this.y;
+    if(this.owner == 2){
+		this.x +=10;
+		this.y +=10;
+	}
+	this.updateQuantityText();
 }
 
 PlayerUnit.prototype = Object.create(Phaser.Sprite.prototype);
@@ -60,16 +67,15 @@ PlayerUnit.prototype.onUnitClicked = function(){
 			this.clearAllSelection();
 			return;
 		}
-		tile = this.map.getTile(this.x/64,this.y/64,this.layer);
+		tile = this.map.getTile(this.x_/64,this.y_/64,this.layer,true);
 		if(tile != null){
-			console.log(tile);
 			for(deltax=-1;deltax<2;deltax++){
 				for(deltay=-1;deltay<2;deltay++){
 					if(deltay == 0 && deltax == 0){
 						continue;
 					}
-					positionx = this.x + deltax * 64;
-					positiony = this.y + deltay * 64;
+					positionx = this.x_ + deltax * 64;
+					positiony = this.y_ + deltay * 64;
 					tilex = positionx/64;
 					tiley = positiony/64;
 					tile = this.map.getTile(tilex,tiley,this.layer);
@@ -114,11 +120,14 @@ PlayerUnit.prototype.onMovementPossibleCircleClicked = function(circle){
 			merged = true;
 		}
 	});
+	unit = circle.unit;
 	if(!merged){
-		circle.unit.x = circle.x;
-		circle.unit.y = circle.y;
+		unit.x = circle.x;
+		unit.y = circle.y;
+		unit.x_ = unit.x;
+		unit.y_ = unit.y;
 	}
-	circle.unit.consumeAct();
+	unit.consumeAct();
 	unit = circle.unit;
 	circle.unit.clearAllSelection();
 	if(merged){
@@ -126,8 +135,13 @@ PlayerUnit.prototype.onMovementPossibleCircleClicked = function(circle){
 		unit.destroy();
 	}
 	else{
+		if(unit.owner == 2){
+			unit.x +=10;
+			unit.y +=10;
+		}
 		unit.updateQuantityText();
 	}
+	
 	
 }
 
@@ -137,7 +151,13 @@ PlayerUnit.prototype.mergeWith = function(unit){
 }
 
 PlayerUnit.prototype.updateQuantityText = function(){
-	this.quantityText.x = this.x;
-	this.quantityText.y = this.y;
+	if(this.owner == 1){
+		this.quantityText.x = this.x;
+		this.quantityText.y = this.y - 5;
+	}
+	else{
+		this.quantityText.x = this.x + this.width/2;
+		this.quantityText.y = this.y + this.height/2;
+	}
 	this.quantityText.text = this.quantity;
 }

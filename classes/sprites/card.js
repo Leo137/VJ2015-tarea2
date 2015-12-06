@@ -66,6 +66,9 @@ Card.prototype.onCardClicked = function(){
 	if(this.type == 1){
 		// Bridge
 		this.unitGroup.forEach(function(unit){
+			if(unit.owner != card.owner){
+				return;
+			}
 			var tile = unit.map.getTile(unit.x_/64,unit.y_/64,unit.layer,true);
 			if(tile != null){
 				for(deltax=-1;deltax<2;deltax++){
@@ -92,6 +95,33 @@ Card.prototype.onCardClicked = function(){
 	}
 	if(this.type == 2){
 		// Catapult
+		this.unitGroup.forEach(function(unit){
+			if(unit.owner != card.owner){
+				return;
+			}
+			var tile = unit.map.getTile(unit.x_/64,unit.y_/64,unit.layer,true);
+			if(tile != null){
+				for(var deltax=-3;deltax<4;deltax++){
+					for(var deltay=-3;deltay<4;deltay++){
+						if(deltay == 0 && deltax == 0){
+							continue;
+						}
+						if(deltax*deltax + deltay*deltay == 3*3){
+							var positionx = unit.x_ + deltax * 64;
+							var positiony = unit.y_ + deltay * 64;
+							var tilex = positionx/64;
+							var tiley = positiony/64;
+							tile = unit.map.getTile(tilex,tiley,unit.layer);
+							if(tile!=null){
+								// Tiles permitidas:
+								// cualquiera
+								card.createActionPossibleCircle(tilex,tiley);
+							}
+						}
+					}
+				}
+			}
+		});
 	}
 	if(this.type == 3){
 		// Tunnel
@@ -99,15 +129,24 @@ Card.prototype.onCardClicked = function(){
 }
 
 Card.prototype.createActionPossibleCircle = function(tilex,tiley){
-	circle = new Phaser.Sprite(game,tilex*64,tiley*64,this.key);
-	circle.tint = 0x00FF00
-	circle.alpha = 0.5;
-	this.actionPossibleGroup.add(circle);
-	circle.inputEnabled = true;
-	circle.card = this;
-	circle.tilex = tilex;
-	circle.tiley = tiley;
-    circle.events.onInputDown.add(this.onMovementPossibleCircleClicked,circle);
+	var founded = false;
+	this.actionPossibleGroup.forEach(function(circle){
+		if(circle.tilex == tilex && circle.tiley == tiley){
+			founded = true;
+			return;
+		}
+	});
+	if(!founded){
+		circle = new Phaser.Sprite(game,tilex*64,tiley*64,this.key);
+		circle.tint = 0x00FF00
+		circle.alpha = 0.5;
+		this.actionPossibleGroup.add(circle);
+		circle.inputEnabled = true;
+		circle.card = this;
+		circle.tilex = tilex;
+		circle.tiley = tiley;
+	    circle.events.onInputDown.add(this.onMovementPossibleCircleClicked,circle);
+	}
 }
 
 Card.prototype.onMovementPossibleCircleClicked = function(circle){
@@ -132,6 +171,15 @@ Card.prototype.onMovementPossibleCircleClicked = function(circle){
 				card.map.putTile(7,circle.tilex,circle.tiley);
 			}
 		}
+	}
+	if(card.type == 2){
+		// Catapult effect
+		card.unitGroup.forEach(function(unit){
+			if(unit.x_/64 == circle.tilex && unit.y_/64 == circle.tiley){
+				unit.quantityText.destroy();
+				unit.destroy();
+			}
+		});
 	}
 	card.clearAllSelection();
 	cardGroup.destroyCard(card);

@@ -64,6 +64,10 @@ CardGroup.prototype.updateCardsPosition = function(game,owner) {
 	}
 }
 
-CardGroup.prototype.update = function() {
-
+CardGroup.prototype.finishTurn = function() {
+	this.forEach(function(card){
+		if(card.clearSelection != null){
+			card.clearSelection();
+		}
+	});
 }

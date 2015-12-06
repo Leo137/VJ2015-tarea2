@@ -256,6 +256,7 @@ finishTurn: function(){
     fx.play('button_click');
     this.processCapture();
     this.unitsGroup.finishTurn();
+    this.cardGroup.finishTurn();
     game.currentPlayer1P = !game.currentPlayer1P;
     this.updateCurrentTurnText();
     this.updateCaptureStats();

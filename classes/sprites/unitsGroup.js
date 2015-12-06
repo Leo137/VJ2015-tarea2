@@ -18,5 +18,8 @@ UnitsGroup.prototype.finishTurn = function() {
 		if(unit.renewAct != null){
 			unit.renewAct();
 		}
+		if(unit.clearSelection != null){
+			unit.clearSelection();
+		}
 	});
 }

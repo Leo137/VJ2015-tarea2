@@ -95,9 +95,10 @@ PlayerUnit.prototype.onUnitClicked = function(){
 						// montaña (8) puente_v (14) casa (15)
 						// castillo_1 (16) castillo_2 (17)
 						// castillo_3 (23) castillo_4 (24)
+						// tunnel_rojo (30) tunnel_azul (31)
 						if(tile.index == 1 || tile.index == 7 || tile.index == 8 || tile.index == 14 || tile.index == 15 || 
-							tile.index == 16 || tile.index == 17 || tile.index == 23 || tile.index == 24){
-							console.log(tile);
+							tile.index == 16 || tile.index == 17 || tile.index == 23 || tile.index == 24
+							|| tile.index == 30 || tile.index == 31){
 							this.createMovementPossibleCircle(tilex,tiley);
 						}
 					}
@@ -115,12 +116,41 @@ PlayerUnit.prototype.createMovementPossibleCircle = function(tilex,tiley){
 	this.movementPossibleGroup.add(circle);
 	circle.inputEnabled = true;
 	circle.unit = this;
+	circle.tilex = tilex;
+	circle.tiley = tiley;
     circle.events.onInputDown.add(this.onMovementPossibleCircleClicked,circle);
 }
 
 PlayerUnit.prototype.onMovementPossibleCircleClicked = function(circle){
 	fx.play('button_click');
-	merged = false;
+	var unit = circle.unit;
+	var tile = circle.unit.map.getTile(circle.tilex,circle.tiley,this.layer);
+	if(tile != null){
+		if(tile.index == 30 && circle.unit.owner == 1){
+			if(tile.tunnel_warp != null){
+				unit.x = tile.tunnel_warp.x *64;
+				unit.y = tile.tunnel_warp.y *64;
+				unit.x_ = unit.x;
+				unit.y_ = unit.y;
+				unit.consumeAct();
+				unit = circle.unit;
+				circle.unit.clearAllSelection();
+				if(merged){
+					unit.quantityText.destroy();
+					unit.destroy();
+				}
+				else{
+					if(unit.owner == 2){
+						unit.x +=10;
+						unit.y +=10;
+					}
+					unit.updateQuantityText();
+				}
+				return;
+			}
+		}
+	}
+	var merged = false;
 	circle.unit.unitGroup.forEach(function(unit){
 		if(merged){
 			return;
@@ -130,7 +160,6 @@ PlayerUnit.prototype.onMovementPossibleCircleClicked = function(circle){
 			merged = true;
 		}
 	});
-	unit = circle.unit;
 	if(!merged){
 		unit.x = circle.x;
 		unit.y = circle.y;
@@ -151,8 +180,6 @@ PlayerUnit.prototype.onMovementPossibleCircleClicked = function(circle){
 		}
 		unit.updateQuantityText();
 	}
-	
-	
 }
 
 PlayerUnit.prototype.mergeWith = function(unit){

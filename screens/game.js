@@ -29,6 +29,10 @@ preload: function() {
     game.load.image('player_unit', 'assets/sprites/player_unit.png');
     game.load.image('player_unit_2', 'assets/sprites/player_unit_2.png');
     game.load.image('capture_tile', 'assets/sprites/capture_tile.png');
+    game.load.image('card_bridge', 'assets/sprites/card_bridge.png');
+    game.load.image('card_catapult', 'assets/sprites/card_catapult.png');
+    game.load.image('card_tunnel_red', 'assets/sprites/card_tunnel_red.png');
+    game.load.image('card_tunnel_blue', 'assets/sprites/card_tunnel_blue.png');
     game.load.tilemap('level_'+levelNumber.toString(), 'assets/maps/'+levelNumber+'.json', null, Phaser.Tilemap.TILED_JSON);
 
     // Load things..
@@ -43,33 +47,33 @@ create: function() {
     // Create things...
     this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
 
-    this.menuText = game.add.text(game.width - 20, 5, "Al Menu", { font: "bold 34px Arial", fill: "#FFFFFF" });
-    this.menuText.anchor.set(1.0,0.0);
-    this.menuText.fixedToCamera = true;
-    this.menuText.stroke =  'black';
-    this.menuText.strokeThickness=2;
-    this.menuText.inputEnabled = true;
-    this.menuText.events.onInputDown.add(this.toMenu, this);
-
-    this.finishTurnText = game.add.text(game.width - 20, game.height - 5, "Finalizar turno", { font: "bold 34px Arial", fill: "#FFFFFF" });
-    this.finishTurnText.anchor.set(1.0);
+    this.finishTurnText = game.add.text(game.width - 20, 5, "Finalizar turno", { font: "bold 34px Arial", fill: "#FFFFFF" });
+    this.finishTurnText.anchor.set(1.0,0.0);
     this.finishTurnText.fixedToCamera = true;
     this.finishTurnText.stroke =  'black';
     this.finishTurnText.strokeThickness=2;
     this.finishTurnText.inputEnabled = true;
     this.finishTurnText.events.onInputDown.add(this.finishTurn, this);
 
-    this.captureStatsText = game.add.text(game.width - 20, game.height - 70, "1P: 0 2P: 0", { font: "bold 24px Arial", fill: "#FFFFFF" });
-    this.captureStatsText.anchor.set(1.0);
+    this.captureStatsText = game.add.text(20, 30, "1P: 0 2P: 0", { font: "bold 24px Arial", fill: "#FFFFFF" });
+    this.captureStatsText.anchor.set(0.0);
     this.captureStatsText.fixedToCamera = true;
     this.captureStatsText.stroke =  'black';
     this.captureStatsText.strokeThickness=2;
 
-    this.currentTurnText = game.add.text(game.width - 20, game.height - 40, "", { font: "bold 24px Arial", fill: "#FFFFFF" });
-    this.currentTurnText.anchor.set(1.0);
+    this.currentTurnText = game.add.text(20, 0, "Turno Jugador 1", { font: "bold 24px Arial", fill: "#FFFFFF" });
+    this.currentTurnText.anchor.set(0.0);
     this.currentTurnText.fixedToCamera = true;
     this.currentTurnText.stroke =  'black';
     this.currentTurnText.strokeThickness=2;
+
+    this.menuText = game.add.text(20, 60, "To Menu", { font: "bold 24px Arial", fill: "#FFFFFF" });
+    this.menuText.anchor.set(0.0,0.0);
+    this.menuText.fixedToCamera = true;
+    this.menuText.stroke =  'black';
+    this.menuText.strokeThickness=2;
+    this.menuText.inputEnabled = true;
+    this.menuText.events.onInputDown.add(this.toMenu, this);
 
     this.map = game.add.tilemap('level_'+levelNumber.toString());
     this.map.addTilesetImage('map');
@@ -130,6 +134,10 @@ create: function() {
 
     this.captureGroup = new CaptureGroup(game,this.map,this.layer);
     this.unitsGroup = new UnitsGroup(game,this.map,this.layer);
+    this.cardGroup = new CardGroup(game,this.map,this.layer,this.unitsGroup);
+    this.unitsGroup.cardGroup = this.cardGroup;
+
+    this.game_ui_group.add(this.cardGroup);
     
     this.unitsGroup.createPlayerUnit(game,2,7,1);
     this.unitsGroup.createPlayerUnit(game,2,8,1);
@@ -138,6 +146,8 @@ create: function() {
     this.unitsGroup.createPlayerUnit(game,12,7,2);
     this.unitsGroup.createPlayerUnit(game,12,8,2);
     this.unitsGroup.createPlayerUnit(game,12,9,2);
+
+    this.cardGroup.createCard(game,1,1);
 
     this.processCapture();
     this.updateCurrentTurnText();

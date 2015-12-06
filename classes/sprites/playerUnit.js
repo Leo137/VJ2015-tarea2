@@ -1,4 +1,4 @@
-var PlayerUnit = function(game, mapx, mapy, map, layer, group, owner){
+var PlayerUnit = function(game, mapx, mapy, map, layer, group, owner, cardGroup){
 	if(owner == 1){
     	Phaser.Sprite.call(this, game, mapx * 64, mapy *64, 'player_unit');
     }
@@ -12,6 +12,7 @@ var PlayerUnit = function(game, mapx, mapy, map, layer, group, owner){
     this.map = map;
     this.layer = layer;
     this.unitGroup = group;
+    this.cardGroup = cardGroup;
     this.movementPossibleGroup = game.add.group();
     this.canAct = true;
     this.owner = owner;
@@ -51,6 +52,14 @@ PlayerUnit.prototype.clearAllSelection = function(){
 			unit.clearSelection();
 		}
 	});
+	if(this.cardGroup != null){
+		this.cardGroup.forEach(function(card){
+			if(card.clearSelection != null){
+				card.clearSelection();
+				console.log("asd");
+			}
+		});
+	}
 }
 
 PlayerUnit.prototype.clearSelection = function(){
@@ -67,6 +76,7 @@ PlayerUnit.prototype.onUnitClicked = function(){
 			this.clearAllSelection();
 			return;
 		}
+		this.clearAllSelection();
 		tile = this.map.getTile(this.x_/64,this.y_/64,this.layer,true);
 		if(tile != null){
 			for(deltax=-1;deltax<2;deltax++){
@@ -110,7 +120,7 @@ PlayerUnit.prototype.createMovementPossibleCircle = function(tilex,tiley){
 
 PlayerUnit.prototype.onMovementPossibleCircleClicked = function(circle){
 	fx.play('button_click');
-	merged = false
+	merged = false;
 	circle.unit.unitGroup.forEach(function(unit){
 		if(merged){
 			return;

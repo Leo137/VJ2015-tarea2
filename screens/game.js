@@ -147,8 +147,6 @@ create: function() {
     this.unitsGroup.createPlayerUnit(game,12,8,2);
     this.unitsGroup.createPlayerUnit(game,12,9,2);
 
-    this.cardGroup.createCard(game,1,1);
-
     this.processCapture();
     this.updateCurrentTurnText();
     this.updateCaptureStats();
@@ -156,6 +154,10 @@ create: function() {
     // Create cameras
     this.camera1P = new Phaser.Point(0,5*64);
     this.camera2P = new Phaser.Point(14*64,5*64);
+
+    this.currentTurn = 0;
+
+    this.startTurn();
 },
 update: function() {
     if(game.isGamepaused){
@@ -252,8 +254,21 @@ rightArrowPressed: function(){
         }
     }
 },
+startTurn: function(){
+    if(this.currentTurn % this.cardGroup.drawCardRate == 0){
+        if(game.currentPlayer1P){
+            this.cardGroup.drawCard(game,1);
+        }
+        else{
+            this.cardGroup.drawCard(game,2);
+        }
+    }
+},
 finishTurn: function(){
     fx.play('button_click');
+    if(!game.currentPlayer1P){
+        this.currentTurn += 1;
+    }
     this.processCapture();
     this.unitsGroup.finishTurn();
     this.cardGroup.finishTurn();
@@ -261,6 +276,7 @@ finishTurn: function(){
     this.updateCurrentTurnText();
     this.updateCaptureStats();
     this.tweenToCurrentCastlePlayer();
+    this.startTurn();
 },
 toMenu: function(){
     fx.play('button_click');

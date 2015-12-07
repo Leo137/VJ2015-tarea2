@@ -126,7 +126,7 @@ PlayerUnit.prototype.onMovementPossibleCircleClicked = function(circle){
 	var unit = circle.unit;
 	var tile = circle.unit.map.getTile(circle.tilex,circle.tiley,this.layer);
 	if(tile != null){
-		if(tile.index == 30 && circle.unit.owner == 1){
+		if((tile.index == 30 && circle.unit.owner == 1) || (tile.index == 31 && circle.unit.owner == 2)){
 			if(tile.tunnel_warp != null){
 				unit.x = tile.tunnel_warp.x *64;
 				unit.y = tile.tunnel_warp.y *64;

@@ -7,12 +7,23 @@ var CardGroup = function(game,map,layer,unitGroup) {
 	this.playerTwoCards = new Phaser.Group(game);
 	this.playerOneCardsArray = [];
 	this.playerTwoCardsArray = [];
-	this.maxNumberOfCardsPerPlayer = 5;
+	this.maxNumberOfCardsPerPlayer = 3;
+	this.drawCardRate = 4;
 	this.fixedToCamera = true;
 }
 
 CardGroup.prototype = Object.create(Phaser.Group.prototype);
 CardGroup.prototype.constructor = CardGroup;
+
+CardGroup.prototype.getRandomInt = function(min, max) {
+  return Math.floor(Math.random() * (max - min)) + min;
+}
+
+CardGroup.prototype.drawCard = function(game,owner) {
+	var type = this.getRandomInt(1,4);
+	this.createCard(game,type,owner);
+}
+
 CardGroup.prototype.createCard = function(game,type,owner) {
 	if(owner == 1 && this.playerOneCardsArray.length < this.maxNumberOfCardsPerPlayer){
 		card = new Card(game,type,this.map,this.layer,this,owner,this.unitGroup);

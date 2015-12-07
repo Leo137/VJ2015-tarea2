@@ -3,8 +3,11 @@ var CaptureTile = function(game, mapx, mapy, map, layer, group, owner){
 	if(owner == 1){
     	this.tint = 0xFF0000;
     }
-    else{
+    else if(owner == 2){
     	this.tint = 0x0000FF;
+    }
+    else{
+        this.tint = 0xFFFF00;
     }
     this.anchor.setTo(0.5);
     this.map = map;

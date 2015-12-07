@@ -1,4 +1,5 @@
 var levelNumber = 1;
+var numeroTurnos = 1;
 
 BasicGame.Game = function(){ }; 
 
@@ -29,6 +30,8 @@ preload: function() {
     game.load.image('player_unit', 'assets/sprites/player_unit.png');
     game.load.image('player_unit_2', 'assets/sprites/player_unit_2.png');
     game.load.image('capture_tile', 'assets/sprites/capture_tile.png');
+    game.load.image('tiger', 'assets/sprites/tiger.png');
+    game.load.image('elephant', 'assets/sprites/Elephant.png');
     game.load.tilemap('level_'+levelNumber.toString(), 'assets/maps/'+levelNumber+'.json', null, Phaser.Tilemap.TILED_JSON);
 
     // Load things..
@@ -139,6 +142,10 @@ create: function() {
     this.unitsGroup.createPlayerUnit(game,12,8,2);
     this.unitsGroup.createPlayerUnit(game,12,9,2);
 
+    //Enemigos
+    this.unitsGroup.createPlayerUnit(game,1,13,3);
+    this.unitsGroup.createPlayerUnit(game,2,19,4);
+
     this.processCapture();
     this.updateCurrentTurnText();
     this.updateCaptureStats();
@@ -169,7 +176,7 @@ updateCaptureStats: function(){
         if(capture.owner == 1){
             capture1P++;
         }
-        else{
+        else if(capture.owner == 2){
             capture2P++;
         }
     });
@@ -220,7 +227,7 @@ leftArrowPressed: function(){
         //game.camera.x -= 64;
         this.game.add.tween(this.game.camera).to( {x: game.camera.x - 64}
             , 100, Phaser.Easing.Quadratic.InOut, true);
-         if(game.currentPlayer1P){
+        if(game.currentPlayer1P){
             this.camera1P.x = game.camera.x - 64;
         }
         else{
@@ -250,6 +257,11 @@ finishTurn: function(){
     this.updateCurrentTurnText();
     this.updateCaptureStats();
     this.tweenToCurrentCastlePlayer();
+    numeroTurnos++;
+    //Comprueba si ambos jugadores ya realizaron sus 10 turnos.
+    if(numeroTurnos == 21){
+        game.state.start('Gameover');
+    }
 },
 toMenu: function(){
     fx.play('button_click');

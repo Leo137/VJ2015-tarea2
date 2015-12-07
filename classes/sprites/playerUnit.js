@@ -2,8 +2,14 @@ var PlayerUnit = function(game, mapx, mapy, map, layer, group, owner){
 	if(owner == 1){
     	Phaser.Sprite.call(this, game, mapx * 64, mapy *64, 'player_unit');
     }
-    else{
+    else if(owner == 2){
     	Phaser.Sprite.call(this, game, mapx * 64, mapy *64, 'player_unit_2');
+    }
+    else if (owner == 3){
+    	Phaser.Sprite.call(this, game, mapx * 64, mapy * 64, 'tiger');
+    }
+    else{
+    	Phaser.Sprite.call(this, game, mapx * 64, mapy * 64, 'elephant');
     }
     this.anchor.setTo(0.0);
     this.scale.setTo(0.8);
@@ -58,7 +64,7 @@ PlayerUnit.prototype.clearSelection = function(){
 }
 
 PlayerUnit.prototype.onUnitClicked = function(){
-	if((game.currentPlayer1P && this.owner == 2) || (!game.currentPlayer1P && this.owner == 1)){
+	if((game.currentPlayer1P && this.owner == 2) || (!game.currentPlayer1P && this.owner == 1) || (this.owner == 3 || this.owner == 4)){
 		return;
 	}
 	fx.play('button_click');

@@ -22,7 +22,15 @@ var PlayerUnit = function(game, mapx, mapy, map, layer, group, owner, cardGroup)
     this.movementPossibleGroup = game.add.group();
     this.canAct = true;
     this.owner = owner;
-    this.quantity = 1;
+    if(owner == 3){
+    	this.quantity = 2;
+    }
+    else if(owner == 4){
+    	this.quantity = 3;
+    }
+    else{
+    	this.quantity = 1;
+    }
     this.quantityText = game.add.text(this.x, this.y, "1", { font: "bold 24px Arial", fill: "#FFFFFF" });
     this.quantityText.anchor.setTo(0.0);
     this.quantityText.stroke =  'black';
@@ -62,7 +70,6 @@ PlayerUnit.prototype.clearAllSelection = function(){
 		this.cardGroup.forEach(function(card){
 			if(card.clearSelection != null){
 				card.clearSelection();
-				console.log("asd");
 			}
 		});
 	}
@@ -166,7 +173,11 @@ PlayerUnit.prototype.onMovementPossibleCircleClicked = function(circle){
 			merged = true;
 		}
 	});
+	var prevx;
+	var prevy;
 	if(!merged){
+		prevx = unit.x;
+		prevy = unit.y;
 		unit.x = circle.x;
 		unit.y = circle.y;
 		unit.x_ = unit.x;
@@ -185,6 +196,8 @@ PlayerUnit.prototype.onMovementPossibleCircleClicked = function(circle){
 			unit.y +=10;
 		}
 		unit.updateQuantityText();
+		game.add.tween(unit).from( {x: prevx,y: prevy}
+            , 50, Phaser.Easing.Quadratic.InOut, true);
 	}
 }
 

@@ -286,7 +286,7 @@ finishTurn: function(){
     this.startTurn();
     numeroTurnos++;
     //Comprueba si ambos jugadores ya realizaron sus 10 turnos.
-    if(numeroTurnos == 21){
+    if(numeroTurnos == 12321){
         game.state.start('Gameover');
     }
 },

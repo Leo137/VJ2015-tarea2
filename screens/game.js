@@ -284,6 +284,7 @@ finishTurn: function(){
     this.updateCaptureStats();
     this.tweenToCurrentCastlePlayer();
     this.startTurn();
+    this.moveTiger();
     numeroTurnos++;
     //Comprueba si ambos jugadores ya realizaron sus 10 turnos.
     if(numeroTurnos == 12321){
@@ -304,26 +305,78 @@ toGame: function(){
 },
 processCapture: function(){
     that = this;
-    this.unitsGroup.forEach(function(unit){
-        uncaptured_zone = true;
-        that.captureGroup.forEach(function(capture){
-            if(capture.x - 32 == unit.x_ && capture.y - 32 == unit.y_){
-                uncaptured_zone = false;
-                if(capture.owner == unit.owner){
-                    // nada pasa
-                    uncaptured_zone = false;
-                }
-                else{
-                    // recaptura
-                    capture.destroy();
+    this.unitsGroup.forEach(function(unit2){
+        that.unitsGroup.forEach(function(unit){
+            if(unit != unit2){
+                uncaptured_zone = true;
+                that.captureGroup.forEach(function(capture){
+                    if(capture.x - 32 == unit.x_ && capture.y - 32 == unit.y_){
+                        uncaptured_zone = false;
+                        if(capture.owner == unit.owner){
+                            // nada pasa
+                            uncaptured_zone = false;
+                        }
+                        //Ambos jugadores (soldados) en la misma casilla, ataque entre soldados.
+                        else if((unit.x_ == unit2.x_) && (unit.y_ == unit2.y_)){
+                            //Casos de batalla:
+                            if(unit.quantity == unit2.quantity){
+                                unit2.quantityText.destroy();
+                                unit.quantityText.destroy();
+                                unit2.destroy();
+                                unit.destroy();
+                                uncaptured_zone = false;
+                            }
+                            else if(Math.abs(unit.quantity - unit2.quantity)/64 == 1){
+                                unit2.quantityText.destroy();
+                                unit.quantityText.destroy();
+                                unit2.destroy();
+                                unit.destroy();
+                                uncaptured_zone = false;
+                            }
+                            else if(Math.abs(unit.quantity - unit2.quantity)/64 >= 2 && unit.quantity > unit2.quantity){
+                                unit.quantity -= unit2.quantity;
+                                unit.quantityText = unit.quantity;
+                                unit2.quantityText.destroy();
+                                unit2.destroy();
+                            }
+                            else if(Math.abs(unit.quantity - unit2.quantity)/64 >= 2 && unit2.quantity > unit.quantity){
+                                unit2.quantity -= unit.quantity;
+                                unit2.quantityText = unit2.quantity;
+                                unit.quantityText.destroy();
+                                unit.destroy();
+                            }
+                        }
+                        else{
+                            // recaptura
+                            capture.destroy();
+                            that.captureGroup.createCaptureTile(game,unit.x_/64,unit.y_/64,unit.owner);
+                        }
+                    }
+                });
+                if(uncaptured_zone){
+                    // captura
                     that.captureGroup.createCaptureTile(game,unit.x_/64,unit.y_/64,unit.owner);
                 }
             }
         });
-        if(uncaptured_zone){
-            // captura
-            that.captureGroup.createCaptureTile(game,unit.x_/64,unit.y_/64,unit.owner);
-        }
+    });
+},
+moveTiger: function(){
+    that = this;
+    this.unitsGroup.forEach(function(unit){
+        that.unitsGroup.forEach(function(unitTiger){
+            if(unitTiger.owner == 3 && unit.owner != 3){
+                console.log(Phaser.Math.distance(unitTiger.x_/64, unit.x_/64, unitTiger.y_/64, unit.y_/64));
+                if(Math.abs(unitTiger.x_/64 - unit.x_/64) <= 1 && Math.abs(unitTiger.y_/64 - unit.y_/64) <= 1){
+                    unit.quantityText.destroy();
+                    unit.destroy();
+                }
+                else if(Math.abs(unitTiger.x_/64 - unit.x_/64) <= 4 && Math.abs(unitTiger.y_/64 - unit.y_/64) <= 4){
+                    unitTiger.y -= 64;
+                    unitTiger.updateQuantityText();
+                }
+            }
+        });
     });
 },
 muteGame: function(){

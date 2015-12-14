@@ -326,20 +326,20 @@ processCapture: function(){
                                 unit.destroy();
                                 uncaptured_zone = false;
                             }
-                            else if(Math.abs(unit.quantity - unit2.quantity) == 1){
+                            else if(Math.abs(unit.quantity - unit2.quantity)/64 == 1){
                                 unit2.quantityText.destroy();
                                 unit.quantityText.destroy();
                                 unit2.destroy();
                                 unit.destroy();
                                 uncaptured_zone = false;
                             }
-                            else if(Math.abs(unit.quantity - unit2.quantity) >= 2 && unit.quantity > unit2.quantity){
+                            else if(Math.abs(unit.quantity - unit2.quantity)/64 >= 2 && unit.quantity > unit2.quantity){
                                 unit.quantity -= unit2.quantity;
                                 unit.quantityText = unit.quantity;
                                 unit2.quantityText.destroy();
                                 unit2.destroy();
                             }
-                            else if(Math.abs(unit.quantity - unit2.quantity) >= 2 && unit2.quantity > unit.quantity){
+                            else if(Math.abs(unit.quantity - unit2.quantity)/64 >= 2 && unit2.quantity > unit.quantity){
                                 unit2.quantity -= unit.quantity;
                                 unit2.quantityText = unit2.quantity;
                                 unit.quantityText.destroy();
@@ -365,10 +365,10 @@ moveTiger: function(){
     that = this;
     this.unitsGroup.forEach(function(unit){
         that.unitsGroup.forEach(function(unitTiger){
-            if(unitTiger.owner == 3){
-                if(Math.abs(unitTiger.x_ - unit.x_) <= 4 && Math.abs(unitTiger.y_ - unit.y_) <= 4){
-                    unit.x += 64;
-                    unit.updateQuantityText();
+            if(unitTiger.owner == 3 && unit.owner != 3){
+                if(Math.abs(unitTiger.x_/64 - unit.x_/64) <= 4 && Math.abs(unitTiger.y_/64 - unit.y_/64) <= 4){
+                    unitTiger.x += 64;
+                    unitTiger.updateQuantityText();
                 }
             }
         });

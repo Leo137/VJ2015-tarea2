@@ -366,8 +366,13 @@ moveTiger: function(){
     this.unitsGroup.forEach(function(unit){
         that.unitsGroup.forEach(function(unitTiger){
             if(unitTiger.owner == 3 && unit.owner != 3){
-                if(Math.abs(unitTiger.x_/64 - unit.x_/64) <= 4 && Math.abs(unitTiger.y_/64 - unit.y_/64) <= 4){
-                    unitTiger.x += 64;
+                console.log(Phaser.Math.distance(unitTiger.x_/64, unit.x_/64, unitTiger.y_/64, unit.y_/64));
+                if(Math.abs(unitTiger.x_/64 - unit.x_/64) <= 1 && Math.abs(unitTiger.y_/64 - unit.y_/64) <= 1){
+                    unit.quantityText.destroy();
+                    unit.destroy();
+                }
+                else if(Math.abs(unitTiger.x_/64 - unit.x_/64) <= 4 && Math.abs(unitTiger.y_/64 - unit.y_/64) <= 4){
+                    unitTiger.y -= 64;
                     unitTiger.updateQuantityText();
                 }
             }

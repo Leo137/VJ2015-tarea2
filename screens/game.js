@@ -151,8 +151,8 @@ create: function() {
     this.unitsGroup.createPlayerUnit(game,12,9,2);
 
     //Enemigos
-    this.unitsGroup.createPlayerUnit(game,1,13,3);
-    this.unitsGroup.createPlayerUnit(game,2,19,4);
+    this.unitsGroup.createPlayerUnit(game,1,16,3);
+    this.unitsGroup.createPlayerUnit(game,11,19,4);
 
     this.processCapture();
     this.updateCurrentTurnText();
@@ -276,6 +276,10 @@ finishTurn: function(){
     if(!game.currentPlayer1P){
         this.currentTurn += 1;
     }
+    this.handleAttack();
+    if(!game.currentPlayer1P){
+        this.actTiger();
+    }
     this.processCapture();
     this.unitsGroup.finishTurn();
     this.cardGroup.finishTurn();
@@ -284,7 +288,6 @@ finishTurn: function(){
     this.updateCaptureStats();
     this.tweenToCurrentCastlePlayer();
     this.startTurn();
-    this.moveTiger();
     numeroTurnos++;
     //Comprueba si ambos jugadores ya realizaron sus 10 turnos.
     if(numeroTurnos == 12321){
@@ -303,77 +306,122 @@ toGame: function(){
     // Reset things...
     game.state.start('Game');
 },
-processCapture: function(){
-    that = this;
+handleAttack: function(){
+    var that = this;
     this.unitsGroup.forEach(function(unit2){
         that.unitsGroup.forEach(function(unit){
-            if(unit != unit2){
-                uncaptured_zone = true;
-                that.captureGroup.forEach(function(capture){
-                    if(capture.x - 32 == unit.x_ && capture.y - 32 == unit.y_){
-                        uncaptured_zone = false;
-                        if(capture.owner == unit.owner){
-                            // nada pasa
-                            uncaptured_zone = false;
-                        }
-                        //Ambos jugadores (soldados) en la misma casilla, ataque entre soldados.
-                        else if((unit.x_ == unit2.x_) && (unit.y_ == unit2.y_)){
-                            //Casos de batalla:
-                            if(unit.quantity == unit2.quantity){
-                                unit2.quantityText.destroy();
-                                unit.quantityText.destroy();
-                                unit2.destroy();
-                                unit.destroy();
-                                uncaptured_zone = false;
+            if(unit != unit2 && unit.owner != unit2.owner){
+                if((unit.x_ == unit2.x_) && (unit.y_ == unit2.y_)){
+                    var unitQuantity = unit.quantity;
+                    var unitQuantity2 = unit2.quantity;
+                    // Revisa los terrenos para agregar la defensa del terreno
+                    that.captureGroup.forEach(function(capture){
+                        if(capture.x - 32 == unit.x_ && capture.y - 32 == unit.y_ && capture.owner == unit.owner){
+                            // Terreno pertenece al jugador unit 1
+                            if(capture.tile.index != 8){
+                                // no es montaña. le baja solo en 1 al jugador unit 2
+                                unitQuantity2 -= 1;
                             }
-                            else if(Math.abs(unit.quantity - unit2.quantity)/64 == 1){
-                                unit2.quantityText.destroy();
-                                unit.quantityText.destroy();
-                                unit2.destroy();
-                                unit.destroy();
-                                uncaptured_zone = false;
-                            }
-                            else if(Math.abs(unit.quantity - unit2.quantity)/64 >= 2 && unit.quantity > unit2.quantity){
-                                unit.quantity -= unit2.quantity;
-                                unit.quantityText = unit.quantity;
-                                unit2.quantityText.destroy();
-                                unit2.destroy();
-                            }
-                            else if(Math.abs(unit.quantity - unit2.quantity)/64 >= 2 && unit2.quantity > unit.quantity){
-                                unit2.quantity -= unit.quantity;
-                                unit2.quantityText = unit2.quantity;
-                                unit.quantityText.destroy();
-                                unit.destroy();
+                            else{
+                                // Es montaña, bajar 2
+                                unitQuantity2 -= 2;
                             }
                         }
-                        else{
-                            // recaptura
-                            capture.destroy();
-                            that.captureGroup.createCaptureTile(game,unit.x_/64,unit.y_/64,unit.owner);
+                        if(capture.x - 32 == unit2.x_ && capture.y - 32 == unit2.y_ && capture.owner == unit2.owner){
+                            // Terreno pertenece al jugador unit 2
+                            if(capture.tile.index != 8){
+                                // no es montaña. le baja solo en 1 al jugador unit 1
+                                unitQuantity -= 1;
+                            }
+                            else{
+                                // Es montaña, bajar 2
+                                unitQuantity -= 2;
+                            }
                         }
+                    });
+                    if(unitQuantity == unitQuantity2){
+                        unit2.quantityText.destroy();
+                        unit.quantityText.destroy();
+                        unit2.destroy();
+                        unit.destroy();
                     }
-                });
-                if(uncaptured_zone){
-                    // captura
-                    that.captureGroup.createCaptureTile(game,unit.x_/64,unit.y_/64,unit.owner);
+                    else if (unitQuantity > unitQuantity2){
+                        if(unitQuantity2 > 0)
+                            unit.quantity -= unitQuantity2;
+                        unit.updateQuantityText();
+                        unit2.quantityText.destroy();
+                        unit2.destroy();
+                    }
+                    else if (unitQuantity2 > unitQuantity){
+                        if(unitQuantity > 0)
+                            unit2.quantity -= unitQuantity;
+                        unit2.updateQuantityText();
+                        unit.quantityText.destroy();
+                        unit.destroy();
+                    }
                 }
             }
         });
     });
 },
-moveTiger: function(){
-    that = this;
+processCapture: function(){
+    var that = this;
+    this.unitsGroup.forEach(function(unit){
+        uncaptured_zone = true;
+        that.captureGroup.forEach(function(capture){
+            if(capture.x - 32 == unit.x_ && capture.y - 32 == unit.y_){
+                uncaptured_zone = false;
+                if(capture.owner == unit.owner){
+                    // nada pasa
+                    uncaptured_zone = false;
+                }
+                else{
+                    // recaptura
+                    capture.destroy();
+                    that.captureGroup.createCaptureTile(game,unit.x_/64,unit.y_/64,unit.owner);
+                }
+            }
+        });
+        if(uncaptured_zone){
+            // captura
+            that.captureGroup.createCaptureTile(game,unit.x_/64,unit.y_/64,unit.owner);
+        }
+    });
+},
+actTiger: function(){
+    var that = this;
+    this.unitsGroup.forEach(function(unit){
+        that.unitsGroup.forEach(function(unitTiger){
+            if(unitTiger.owner == 3 && unit.owner != 3 && unitTiger.canAct){
+                if(Math.abs(unitTiger.x_/64 - unit.x_/64) <= 4 && Math.abs(unitTiger.y_/64 - unit.y_/64) <= 4){
+                    if(unitTiger.x_/64 > unit.x_/64){
+                        unitTiger.x -= 64;
+                    }
+                    else if(unitTiger.x_/64 < unit.x_/64){
+                        unitTiger.x += 64;
+                    }
+                    if(unitTiger.y_/64 > unit.y_/64){
+                        unitTiger.y -= 64;
+                    }
+                    else if(unitTiger.y_/64 < unit.y_/64){
+                        unitTiger.y += 64;
+                    }
+                    unitTiger.x_ = unitTiger.x;
+                    unitTiger.y_ = unitTiger.y;
+                    unitTiger.updateQuantityText();
+                    unitTiger.canAct = false;
+                }
+            }
+        });
+    });
+    // Attack
     this.unitsGroup.forEach(function(unit){
         that.unitsGroup.forEach(function(unitTiger){
             if(unitTiger.owner == 3 && unit.owner != 3){
-                console.log(Phaser.Math.distance(unitTiger.x_/64, unit.x_/64, unitTiger.y_/64, unit.y_/64));
+                //console.log(Phaser.Math.distance(unitTiger.x_/64, unit.x_/64, unitTiger.y_/64, unit.y_/64));
                 if(Math.abs(unitTiger.x_/64 - unit.x_/64) <= 1 && Math.abs(unitTiger.y_/64 - unit.y_/64) <= 1){
                     unit.quantityText.destroy();
                     unit.destroy();
-                }
-                else if(Math.abs(unitTiger.x_/64 - unit.x_/64) <= 4 && Math.abs(unitTiger.y_/64 - unit.y_/64) <= 4){
-                    unitTiger.y -= 64;
-                    unitTiger.updateQuantityText();
                 }
             }
         });

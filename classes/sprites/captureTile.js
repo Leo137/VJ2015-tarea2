@@ -13,6 +13,7 @@ var CaptureTile = function(game, mapx, mapy, map, layer, group, owner){
     this.owner = owner;
     this.game.add.tween(this.scale).from( {x: 0.0,y: 0.0}
             , 300, Phaser.Easing.Quadratic.InOut, true);
+    this.tile = this.map.getTile(mapx,mapy);
 }
 
 CaptureTile.prototype = Object.create(Phaser.Sprite.prototype);

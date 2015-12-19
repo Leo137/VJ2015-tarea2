@@ -1,5 +1,9 @@
 var levelNumber = 1;
 var numeroTurnos = 1;
+var capture1P = 0;
+var capture2P = 0;
+var destroyed1P = false;
+var destroyed2P = false;
 
 BasicGame.Game = function(){ }; 
 
@@ -289,8 +293,28 @@ finishTurn: function(){
     this.tweenToCurrentCastlePlayer();
     this.startTurn();
     numeroTurnos++;
-    //Comprueba si ambos jugadores ya realizaron sus 10 turnos.
-    if(numeroTurnos == 12321){
+    //Contar número de soldados de cada jugador.
+    console.log(numeroTurnos);
+    numberSoldiers1P = 0;
+    numberSoldiers2P = 0;
+    this.unitsGroup.forEach(function(unit){
+        if(unit.owner == 1){
+            numberSoldiers1P++;
+        }
+        else if (unit.owner == 2){
+            numberSoldiers2P++;
+        }
+    });
+    if(numberSoldiers1P == 0){
+        destroyed1P = true;
+        game.state.start('Gameover');
+    }
+    else if (numberSoldiers2P == 0){
+        destroyed2P = true;
+        game.state.start('Gameover');
+    }
+    //Comprueba si ambos jugadores ya realizaron sus 100 turnos.
+    else if(numeroTurnos == 81){
         game.state.start('Gameover');
     }
 },

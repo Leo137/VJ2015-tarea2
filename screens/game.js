@@ -43,13 +43,13 @@ preload: function() {
     game.load.image('tiger', 'assets/sprites/tiger.png');
     game.load.image('elephant', 'assets/sprites/Elephant.png');
     game.load.tilemap('level_'+levelNumber.toString(), 'assets/maps/'+levelNumber+'.json', null, Phaser.Tilemap.TILED_JSON);
+	game.load.audio('ageofempires','assets/bgm/AoEIIIMainTheme.mp3');
 
     // Load things..
 },
 create: function() {
-	
 	numeroTurnos = 1;
-	
+	this.music = game.add.audio('ageofempires');
     game.currentPlayer1P = true;
 	this.map = game.add.tilemap('level_'+levelNumber.toString());
     this.map.addTilesetImage('map');
@@ -214,6 +214,7 @@ create: function() {
     this.currentTurn = 0;
 
     this.startTurn();
+	this.music.play();
 },
 update: function() {
     if(game.isGamepaused){

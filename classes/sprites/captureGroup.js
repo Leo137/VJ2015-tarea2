@@ -12,4 +12,17 @@ CaptureGroup.prototype.createCaptureTile = function(game,mapx,mapy,owner) {
 }
 CaptureGroup.prototype.update = function() {
 
+},
+CaptureGroup.prototype.finishTurn = function(unitsGroup) {
+	var that = this;
+    var map = this.map;
+    this.forEach(function(capture){
+        var tile = map.getTile(capture.mapx,capture.mapy);
+        if(tile.index == 15 && (capture.owner == 1 || capture.owner == 2)){
+        	if(!game.currentPlayer1P){
+            	// Es casa, produce una unit
+            	unitsGroup.createPlayerUnit(game,capture.mapx,capture.mapy,capture.owner);
+        	}
+        }
+    });
 }

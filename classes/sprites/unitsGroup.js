@@ -7,8 +7,17 @@ var UnitsGroup = function(game,map,layer) {
 UnitsGroup.prototype = Object.create(Phaser.Group.prototype);
 UnitsGroup.prototype.constructor = UnitsGroup;
 UnitsGroup.prototype.createPlayerUnit = function(game,mapx,mapy,owner) {
-	playerUnit = new PlayerUnit(game,mapx,mapy,this.map,this.layer,this,owner,this.cardGroup);
-	this.add(playerUnit);
+	var founded = false;
+	this.forEach(function(unit){
+		if(unit.mapx == mapx && unit.mapy == mapy && unit.owner == owner){
+			unit.addQuantity(1);
+			founded = true;
+		}
+	});
+	if(!founded){
+		var playerUnit = new PlayerUnit(game,mapx,mapy,this.map,this.layer,this,owner,this.cardGroup);
+		this.add(playerUnit);
+	}
 }
 UnitsGroup.prototype.update = function() {
 

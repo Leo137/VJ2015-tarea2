@@ -6,8 +6,6 @@ var destroyed1P = false;
 var destroyed2P = false;
 // the structure of the map
 var map;
-var seed = Math.floor(Math.random()*(11-9)+9);
-var rio=4;
 
 BasicGame.Game = function(){ }; 
 
@@ -49,9 +47,7 @@ preload: function() {
     // Load things..
 },
 create: function() {
-	var t1;
-	var t2;
-	var third=1/3;
+	
 	
 	
     game.currentPlayer1P = true;
@@ -66,27 +62,39 @@ create: function() {
 			this.map.putTile(1,x,y,this.layer); 
 	*/
 	//crear rio
-	
-	this.map.putTile(rio,seed,0,this.layer); 
-	t1=seed;
+    var t1;
+    var t2;
+    var third=1/3;
+	var seed = Math.floor((0.5-Math.random())*(2)+8);
+    var rio=4;
+	var t1=seed;
+    this.map.putTile(rio,seed,0,this.layer);
 	for (var z = 1; z < 20; z++){
-		t2=Math.random();
-		if(t2>2*third){
-			t1=t1+1;
-			if(t1>19)
-				t1=19;
-			this.map.putTile(rio,t1,z,this.layer); 
-		}
-		if(t2<third){
-			t1=t1-1;
-			if(t1<0)
-				t1=0;
-			this.map.putTile(rio,t1,z,this.layer);
-		}
-		else{
-			this.map.putTile(rio,t1,z,this.layer);
-		}
+        this.map.putTile(rio,t1,z,this.layer);
 	}
+
+    for (var y = 0; y < 20; y++){
+        for (var x = 0; x < 15; x++){
+            if(x > 3 && x < 12){
+                var t2=Math.random();
+                if(Math.abs(x-seed) == 1){
+                    if(t2 < third/1.5){
+                        this.map.putTile(15,x,y,this.layer);
+                    }
+                }
+                else{
+                    if(seed != x){
+                        if(t2 < third/2){
+                            this.map.putTile(8,x,y,this.layer);
+                        }
+                        else if(t2 > third*2.9){
+                            this.map.putTile(15,x,y,this.layer);
+                        }
+                    }
+                }
+            }
+        }
+    }
 	
     this.pieProgressPie.DestroyPie();
     this.pieProgressPie = null;
@@ -121,8 +129,6 @@ create: function() {
     this.menuText.strokeThickness=2;
     this.menuText.inputEnabled = true;
     this.menuText.events.onInputDown.add(this.toMenu, this);
-
-
 
     //this.map.setCollisionBetween(0,900);
     
@@ -314,6 +320,10 @@ startTurn: function(){
         }
     }
 },
+createUnit: function(game,mapx,mapy,owner){
+    this.unitsGroup.createPlayerUnit(game,mapx,mapy,owner);
+    console.log(this.unitsGroup);
+},
 finishTurn: function(){
     fx.play('button_click');
     if(!game.currentPlayer1P){
@@ -326,6 +336,7 @@ finishTurn: function(){
     this.processCapture();
     this.unitsGroup.finishTurn();
     this.cardGroup.finishTurn();
+    this.captureGroup.finishTurn(this.unitsGroup);
     game.currentPlayer1P = !game.currentPlayer1P;
     this.updateCurrentTurnText();
     this.updateCaptureStats();
@@ -333,7 +344,6 @@ finishTurn: function(){
     this.startTurn();
     numeroTurnos++;
     //Contar número de soldados de cada jugador.
-    console.log(numeroTurnos);
     numberSoldiers1P = 0;
     numberSoldiers2P = 0;
     this.unitsGroup.forEach(function(unit){

@@ -22,6 +22,8 @@ var PlayerUnit = function(game, mapx, mapy, map, layer, group, owner, cardGroup)
     this.movementPossibleGroup = game.add.group();
     this.canAct = true;
     this.owner = owner;
+    this.mapx = mapx;
+    this.mapy = mapy;
     if(owner == 3){
     	this.quantity = 2;
     }
@@ -199,6 +201,11 @@ PlayerUnit.prototype.onMovementPossibleCircleClicked = function(circle){
 		game.add.tween(unit).from( {x: prevx,y: prevy}
             , 50, Phaser.Easing.Quadratic.InOut, true);
 	}
+}
+
+PlayerUnit.prototype.addQuantity = function(quantity){
+	this.quantity += quantity;
+	this.updateQuantityText();
 }
 
 PlayerUnit.prototype.mergeWith = function(unit){

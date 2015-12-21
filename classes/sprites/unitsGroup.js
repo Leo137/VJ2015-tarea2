@@ -9,7 +9,7 @@ UnitsGroup.prototype.constructor = UnitsGroup;
 UnitsGroup.prototype.createPlayerUnit = function(game,mapx,mapy,owner) {
 	var founded = false;
 	this.forEach(function(unit){
-		if(unit.mapx == mapx && unit.mapy == mapy && unit.owner == owner){
+		if(unit.x_/64 == mapx && unit.y_/64 == mapy && unit.owner == owner){
 			unit.addQuantity(1);
 			founded = true;
 		}

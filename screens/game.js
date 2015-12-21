@@ -48,7 +48,7 @@ preload: function() {
 },
 create: function() {
 	
-	
+	numeroTurnos = 1;
 	
     game.currentPlayer1P = true;
 	this.map = game.add.tilemap('level_'+levelNumber.toString());
@@ -224,10 +224,10 @@ update: function() {
 },
 updateCurrentTurnText: function(){
     if(game.currentPlayer1P){
-        this.currentTurnText.text = "Turno jugador 1";
+        this.currentTurnText.text = "Turno jugador 1, turno:"+numeroTurnos;
     }
     else{
-        this.currentTurnText.text = "Turno jugador 2";
+        this.currentTurnText.text = "Turno jugador 2, turno:"+numeroTurnos;
     }
 },
 updateCaptureStats: function(){
@@ -338,11 +338,11 @@ finishTurn: function(){
     this.cardGroup.finishTurn();
     this.captureGroup.finishTurn(this.unitsGroup);
     game.currentPlayer1P = !game.currentPlayer1P;
+    numeroTurnos++;
     this.updateCurrentTurnText();
     this.updateCaptureStats();
     this.tweenToCurrentCastlePlayer();
     this.startTurn();
-    numeroTurnos++;
     //Contar número de soldados de cada jugador.
     numberSoldiers1P = 0;
     numberSoldiers2P = 0;

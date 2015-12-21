@@ -4,6 +4,10 @@ var capture1P = 0;
 var capture2P = 0;
 var destroyed1P = false;
 var destroyed2P = false;
+// the structure of the map
+var map;
+var seed = Math.floor(Math.random()*(11-9)+9);
+var rio=4;
 
 BasicGame.Game = function(){ }; 
 
@@ -45,9 +49,45 @@ preload: function() {
     // Load things..
 },
 create: function() {
-
+	var t1;
+	var t2;
+	var third=1/3;
+	
+	
     game.currentPlayer1P = true;
-
+	this.map = game.add.tilemap('level_'+levelNumber.toString());
+    this.map.addTilesetImage('map');
+	this.layer = this.map.createLayer('Capa de Patrones 1');
+	
+	//vaciar mapa
+	/*
+	for (var y = 0; y < 20; y++)
+		for (var x = 0; x < 20; x++)		
+			this.map.putTile(1,x,y,this.layer); 
+	*/
+	//crear rio
+	
+	this.map.putTile(rio,seed,0,this.layer); 
+	t1=seed;
+	for (var z = 1; z < 20; z++){
+		t2=Math.random();
+		if(t2>2*third){
+			t1=t1+1;
+			if(t1>19)
+				t1=19;
+			this.map.putTile(rio,t1,z,this.layer); 
+		}
+		if(t2<third){
+			t1=t1-1;
+			if(t1<0)
+				t1=0;
+			this.map.putTile(rio,t1,z,this.layer);
+		}
+		else{
+			this.map.putTile(rio,t1,z,this.layer);
+		}
+	}
+	
     this.pieProgressPie.DestroyPie();
     this.pieProgressPie = null;
 
@@ -82,11 +122,10 @@ create: function() {
     this.menuText.inputEnabled = true;
     this.menuText.events.onInputDown.add(this.toMenu, this);
 
-    this.map = game.add.tilemap('level_'+levelNumber.toString());
-    this.map.addTilesetImage('map');
+
 
     //this.map.setCollisionBetween(0,900);
-    this.layer = this.map.createLayer('Capa de Patrones 1');
+    
     this.layer.resizeWorld();
     this.layer.resize(15*64,20*64);
 

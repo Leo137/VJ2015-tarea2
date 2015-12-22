@@ -44,7 +44,7 @@ BasicGame.Menu.prototype = {
 
         game.load.audio('sfx', 'assets/sfx/fx.mp3');
 
-        game.load.image('logo', 'assets/sprites/logo.png');
+        game.load.image('bg', 'assets/sprites/bg.jpg');
 
         // game.load.image('money_icon', 'assets/sprites/money_icon.png');
 
@@ -77,10 +77,27 @@ BasicGame.Menu.prototype = {
         this.scale.pageAlignHorizontally = true;
         this.scale.pageAlignVertically = true;
         
-        this.logo = game.add.sprite(0, game.height/2 - game.height/4.5, 'logo');
-        this.logo.x = this.logo.width/2 - 14;
-        this.logo.anchor.setTo(0.5,0.5);
-        this.logo.scale.setTo(1.0);
+        this.bg = game.add.sprite(0, 0, 'bg');
+        this.bg.anchor.setTo(0.0,0.0);
+        this.bg.width = game.width;
+        this.bg.height = game.height;
+
+        this.logoText = game.add.text(0, game.height/2 - game.height/8, '"Land of Great Origins"', { font: "bold 44px Tahoma", fill: "#FFFFFF" });
+        this.logoText.x = 30;
+        this.logoText.stroke =  'grey';
+        this.logoText.strokeThickness=3;
+        this.logoText.anchor.setTo(0.0,0.5);
+        this.logoText.scale.setTo(1.0);
+
+        var grd = this.logoText.context.createLinearGradient(0, 0, 0, this.logoText.height);
+
+        //  Add in 2 color stops
+        grd.addColorStop(0, '#FCFC34');   
+        grd.addColorStop(1, '#B0B001');
+
+        //  And apply to the Text
+        this.logoText.fill = grd;
+
 
         this.startGameText = game.add.text(0 + 30, game.height/2 + game.height/3 - 70, LocalizableStrings.getString("menu-startgametext"), { font: "bold 34px Arial", fill: "#FFFFFF" });
 
@@ -91,14 +108,14 @@ BasicGame.Menu.prototype = {
         this.startGameText.inputEnabled = true;
         this.startGameText.events.onInputDown.add(this.toGame, this);
 
-        this.instructionsText = game.add.text(0 + 30, game.height/2 + game.height/3, LocalizableStrings.getString("menu-instructionstext"), { font: "bold 34px Arial", fill: "#FFFFFF" });
+        // this.instructionsText = game.add.text(0 + 30, game.height/2 + game.height/3, LocalizableStrings.getString("menu-instructionstext"), { font: "bold 34px Arial", fill: "#FFFFFF" });
 
-        this.instructionsText.anchor.set(0.0);
-        this.instructionsText.stroke =  'black';
-        this.instructionsText.strokeThickness=2;
+        // this.instructionsText.anchor.set(0.0);
+        // this.instructionsText.stroke =  'black';
+        // this.instructionsText.strokeThickness=2;
 
-        this.instructionsText.inputEnabled = true;
-        this.instructionsText.events.onInputDown.add(this.showInstructions, this);
+        // this.instructionsText.inputEnabled = true;
+        // this.instructionsText.events.onInputDown.add(this.showInstructions, this);
 
         if(isLandscapeLittle){
             this.scale.scaleMode = Phaser.ScaleManager.EXACT_FIT;
@@ -135,11 +152,6 @@ BasicGame.Menu.prototype = {
     },
     update: function() {
 		this.menuBackground.updateBackground();
-        if(game.time.time > this.time + 50){
-            this.time = game.time.time;
-            this.logo.y = game.height/2 - game.height/4.5 + Math.sin(game.time.time/200)*0.0;
-            this.logo.angle = Math.sin(game.time.time/800)*0.2;
-        }
     },
     toGame: function(){
         fx.play('button_click');

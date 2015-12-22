@@ -1,9 +1,9 @@
 var levelNumber = 1;
-var numeroTurnos = 1;
-var capture1P = 0;
-var capture2P = 0;
-var destroyed1P = false;
-var destroyed2P = false;
+var numeroTurnos;
+var capture1P;
+var capture2P;
+var destroyed1P;
+var destroyed2P;
 // the structure of the map
 var map;
 
@@ -48,7 +48,12 @@ preload: function() {
     // Load things..
 },
 create: function() {
+    capture1P = 0;
+    capture2P = 0;
+    destroyed1P = false;
+    destroyed2P = false;
 	numeroTurnos = 1;
+
 	this.music = game.add.audio('ageofempires');
     game.currentPlayer1P = true;
 	this.map = game.add.tilemap('level_'+levelNumber.toString());
@@ -357,23 +362,25 @@ finishTurn: function(){
     });
     if(numberSoldiers1P == 0){
         destroyed1P = true;
-        game.state.start('Gameover');
+        this.toGameover();
     }
     else if (numberSoldiers2P == 0){
         destroyed2P = true;
-        game.state.start('Gameover');
+        this.toGameover();
     }
     //Comprueba si ambos jugadores ya realizaron sus 100 turnos.
     else if(numeroTurnos == 81){
-        game.state.start('Gameover');
+        this.toGameover();
     }
 },
 toMenu: function(){
     fx.play('button_click');
     game.state.start('Menu');
+    this.music.stop();
 },
 toGameover: function(){
     game.state.start('Gameover');
+    this.music.stop();
 },
 toGame: function(){
     //Para reintentar

@@ -28,9 +28,10 @@ BasicGame.Menu.prototype = {
         }
 		this.menuBackground.updateBackground();
     },
-    preload: function() {   
-		this.menuBackground = new MenuBackground(game,0,0,game.width,game.height,'bg_pattern_color');
-		this.menuBackground.isRandomColor = true;
+    preload: function() {
+        this.menuBackground = new MenuBackground(game,0,0,game.width,game.height,'bg_pattern_color');
+        this.menuBackground.isRandomColor = true;
+        
 
         //GameVarsData.loadFile();
         this.pieProgressPie = new PieProgress(game, game.width/2,game.height/2, 16, '#909090', 0);
@@ -44,7 +45,7 @@ BasicGame.Menu.prototype = {
 
         game.load.audio('sfx', 'assets/sfx/fx.mp3');
 
-        game.load.image('bg', 'assets/sprites/bg.jpg');
+        ;
 
         // game.load.image('money_icon', 'assets/sprites/money_icon.png');
 
@@ -52,8 +53,20 @@ BasicGame.Menu.prototype = {
         game.load.image('sound_off', 'assets/sprites/sound_off.png');
 
         // game.load.spritesheet('timer', 'assets/sprites/timer.png', 150, 20);
+
+        if(game.cache.checkImageKey("bg")){
+            this.bg = game.add.sprite(0, 0, 'bg');
+            this.bg.anchor.setTo(0.0,0.0);
+            this.bg.width = game.width;
+            this.bg.height = game.height;
+        }
+        else{
+            game.load.image('bg', 'assets/sprites/bg.jpg')
+        }
     },
     create: function() {
+
+        SaveManager.continueGame();
 
         this.pieProgressPie.DestroyPie();
         this.pieProgressPie = null;
@@ -77,10 +90,12 @@ BasicGame.Menu.prototype = {
         this.scale.pageAlignHorizontally = true;
         this.scale.pageAlignVertically = true;
         
-        this.bg = game.add.sprite(0, 0, 'bg');
-        this.bg.anchor.setTo(0.0,0.0);
-        this.bg.width = game.width;
-        this.bg.height = game.height;
+        if(this.bg == null){
+            this.bg = game.add.sprite(0, 0, 'bg');
+            this.bg.anchor.setTo(0.0,0.0);
+            this.bg.width = game.width;
+            this.bg.height = game.height;
+        }   
 
         this.logoText = game.add.text(0, game.height/2 - game.height/8, '"Land of Great Origins"', { font: "bold 44px Tahoma", fill: "#FFFFFF" });
         this.logoText.x = 30;
@@ -107,6 +122,24 @@ BasicGame.Menu.prototype = {
 
         this.startGameText.inputEnabled = true;
         this.startGameText.events.onInputDown.add(this.toGame, this);
+
+        this.creditsText = game.add.text(game.width - 30, game.height/2 + game.height/3 - 0, "Creditos", { font: "bold 34px Arial", fill: "#FFFFFF" });
+
+        this.creditsText.anchor.set(1.0,0.0);
+        this.creditsText.stroke =  'black';
+        this.creditsText.strokeThickness=2;
+
+        this.creditsText.inputEnabled = true;
+        this.creditsText.events.onInputDown.add(this.toCredits, this);
+
+        this.statsText = game.add.text(game.width - 30, game.height/2 + game.height/3 - 70, "Estadisticas", { font: "bold 34px Arial", fill: "#FFFFFF" });
+
+        this.statsText.anchor.set(1.0,0.0);
+        this.statsText.stroke =  'black';
+        this.statsText.strokeThickness=2;
+
+        this.statsText.inputEnabled = true;
+        this.statsText.events.onInputDown.add(this.toStats, this);
 
         // this.instructionsText = game.add.text(0 + 30, game.height/2 + game.height/3, LocalizableStrings.getString("menu-instructionstext"), { font: "bold 34px Arial", fill: "#FFFFFF" });
 
@@ -156,6 +189,14 @@ BasicGame.Menu.prototype = {
     toGame: function(){
         fx.play('button_click');
         game.state.start('Game');
+    },
+    toCredits: function(){
+        fx.play('button_click');
+        game.state.start('Credits');
+    },
+    toStats: function(){
+        fx.play('button_click');
+        game.state.start('Stats');
     },
     showInstructions: function(){
         fx.play('button_click');

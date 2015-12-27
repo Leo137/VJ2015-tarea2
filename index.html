@@ -78,6 +78,8 @@
     <script type="text/javascript" src="screens/menu.js"></script>
     <script type="text/javascript" src="screens/game.js"></script>
     <script type="text/javascript" src="screens/gameover.js"></script>
+    <script type="text/javascript" src="screens/credits.js"></script>
+    <script type="text/javascript" src="screens/stats.js"></script>
 
     <script type="text/javascript">
         // añadir pantallas
@@ -85,6 +87,8 @@
         game.state.add('Menu',BasicGame.Menu);
         game.state.add('Game',BasicGame.Game);
         game.state.add('Gameover',BasicGame.Gameover);
+        game.state.add('Credits',BasicGame.Credits);
+        game.state.add('Stats',BasicGame.Stats);
         // lanzar premenu (load de assets basicos)
         game.state.start('PreMenu');
         game.scale = Phaser.ScaleManager.SHOW_ALL;

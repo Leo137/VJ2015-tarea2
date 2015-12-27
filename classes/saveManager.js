@@ -5,133 +5,210 @@ var SaveManager = new function(){
 
 
 	this.saveGame = function(){
-		console.log("SAVING GAME");
 		localStorage.setItem('VJ2015-tarea2_save', JSON.stringify(this.SaveData));
-
 	};
 
 
 	this.continueGame = function(){
 		if(this.hasData()){
-			console.log("CONTINUING GAME");
 			this.SaveData = JSON.parse(localStorage.getItem('VJ2015-tarea2_save'));
 		}
-
+		else{
+			this.SaveData = new Array();
+			this.SaveData[0] = {};
+		}
 	};
 
 	this.resetSave = function(){
-
 		localStorage.setItem('VJ2015-tarea2_save', null);
 		this.SaveData = null;
-
 	};
 
 	this.hasData = function(){
 		return localStorage.getItem('VJ2015-tarea2_save') != null
-		 && localStorage.getItem('VJ2015-tarea2_save') != "null";
+		 && localStorage.getItem('VJ2015-tarea2_save') != "null"
+		 && localStorage.getItem('VJ2015-tarea2_save') != undefined
+		 && localStorage.getItem('VJ2015-tarea2_save') != "undefined";
 	};
 
-	this.saveLevelCleared = function(number,stats){
-		/*
-
-			'stats' contents:
-				cleared
-				stars
-				moneyFinal
-				locked
-				...
-
-		*/
-
-		if(!this.hasData()){
-			this.SaveData = new Array();
-		}
-		if(this.SaveData[number] != null){
-			if(this.SaveData[number].moneyFinal > stats.moneyFinal){
-				console.log("SAVE HAS BETTER LEVEL CLEAR");
-				return;
-			}
-		}
-		this.SaveData[number] = stats;
-
-		this.saveGame();
-	};
-
-	this.getLevelCleared = function(number){
-		if(this.SaveData != null){
-			if(number in this.SaveData){
-				return this.SaveData[number];
-			}
-		}
-		return null;
-	};
-
-	this.getTotalRecollectedMoney = function(){
-		var value = 0;
-		if(this.SaveData != null){
-			this.SaveData.forEach(function(level){
-				if(level != null && level.cleared){
-					value += level.moneyFinal;
-				}
-			});
-		}
-		value -= this.getUpgradeMoney();
-		return value;
-	};
-	this.setUpgradeMoney = function(value){
-		//Setea el dinero gastado en upgrades
-		//Asume que no existe un level 0, por lo que lo ocupa para guardar esto
+	this.setTimesPlayed = function(timesPlayed){
+		//Setea el timesPlayed
 		if(this.SaveData != null){
 			if(this.SaveData[0] == undefined){
 				this.SaveData[0] = {};
 			}
-			this.SaveData[0].value = value;
+			this.SaveData[0].timesPlayed = timesPlayed;
 		}
 		this.saveGame();
 	};
-	this.modUpgradeMoney = function(value){
-		//Sube o baja el dinero gastado en upgrade en el valor dado por value
+
+	this.getTimesPlayed = function(){
+		//Obtiene la cantidad de veces jugadas
 		if(this.SaveData != null){
-			if(this.SaveData[0] == undefined){
-				this.SaveData[0] = {};
-			}
-			if(this.SaveData[0].value == undefined){
-				this.SaveData[0].value = value;
-			}
-			else{
-				this.SaveData[0].value = this.SaveData[0].value + value;
-			}
-		}
-		this.saveGame();
-	}
-	this.getUpgradeMoney = function(value){
-		//Obtiene el dinero gastado en upgrades
-		//Asume que el level 0 es usado para guardar solo lo referente a upgrades
-		if(this.SaveData != null){
-			if(this.SaveData[0] == undefined || this.SaveData[0].value == undefined){
+			if(this.SaveData[0] == undefined || this.SaveData[0].timesPlayed == undefined){
 				return 0;
 			}
-			return this.SaveData[0].value;
+			return this.SaveData[0].timesPlayed;
+		}
+		else{
+			return 0;
 		}
 	};
-	this.setUpgradeTier = function(tier){
-		//Setea el tier de casa en el cual se encuentra el jugador
+
+	this.addTimesPlayed = function(value){
+		// Añade el valor de value a la cantidad de veces jugadas
+		var x = this.getTimesPlayed();
+		this.setTimesPlayed(x+value);
+	};
+
+	this.setP1Wins = function(P1Wins){
+		//Setea el P1Wins
 		if(this.SaveData != null){
 			if(this.SaveData[0] == undefined){
 				this.SaveData[0] = {};
 			}
-			this.SaveData[0].tier = tier;
+			this.SaveData[0].P1Wins = P1Wins;
 		}
 		this.saveGame();
 	};
-	this.getUpgradeTier = function(){
-		//Obtiene el tier de casa en el cual se encuentra el jugador
+	
+	this.getP1Wins = function(){
+		//Obtiene la cantidad de veces que P1 ha ganado
 		if(this.SaveData != null){
-			if(this.SaveData[0] == undefined || this.SaveData[0].tier == undefined){
+			if(this.SaveData[0] == undefined || this.SaveData[0].P1Wins == undefined){
 				return 0;
 			}
-			return this.SaveData[0].tier;
+			return this.SaveData[0].P1Wins;
 		}
-	}
+		else{
+			return 0;
+		}
+	};
+
+	this.addP1Wins = function(value){
+		// Añade el valor de value a los wins p2
+		var x = this.getP1Wins();
+		this.setP1Wins(x+value);
+	};
+
+	this.setP2Wins = function(P2Wins){
+		//Setea el P2Wins
+		if(this.SaveData != null){
+			if(this.SaveData[0] == undefined){
+				this.SaveData[0] = {};
+			}
+			this.SaveData[0].P2Wins = P2Wins;
+		}
+		this.saveGame();
+	};
+	
+	this.getP2Wins = function(){
+		//Obtiene la cantidad de veces que P2 ha ganado
+		if(this.SaveData != null){
+			if(this.SaveData[0] == undefined || this.SaveData[0].P2Wins == undefined){
+				return 0;
+			}
+			return this.SaveData[0].P2Wins;
+		}
+		else{
+			return 0;
+		}
+	};
+
+	this.addP2Wins = function(value){
+		// Añade el valor de value a los wins p2
+		var x = this.getP2Wins();
+		this.setP2Wins(x+value);
+	};
+
+	this.setTies = function(ties){
+		//Setea el ties
+		if(this.SaveData != null){
+			if(this.SaveData[0] == undefined){
+				this.SaveData[0] = {};
+			}
+			this.SaveData[0].ties = ties;
+		}
+		this.saveGame();
+	};
+	
+	this.getTies = function(){
+		//Obtiene la cantidad de veces que se ha empatado
+		if(this.SaveData != null){
+			if(this.SaveData[0] == undefined || this.SaveData[0].ties == undefined){
+				return 0;
+			}
+			return this.SaveData[0].ties;
+		}
+		else{
+			return 0;
+		}
+	};
+
+	this.addTies = function(value){
+		// Añade el valor de value a los ties
+		var x = this.getTies();
+		this.setTies(x+value);
+	};
+
+	this.setCardsUsed = function(cardsUsed){
+		//Setea las cartas usadas
+		if(this.SaveData != null){
+			if(this.SaveData[0] == undefined){
+				this.SaveData[0] = {};
+			}
+			this.SaveData[0].cardsUsed = cardsUsed;
+		}
+		this.saveGame();
+	};
+	
+	this.getCardsUsed = function(){
+		//Obtiene la cantidad de veces que se han usado cartas
+		if(this.SaveData != null){
+			if(this.SaveData[0] == undefined || this.SaveData[0].cardsUsed == undefined){
+				return 0;
+			}
+			return this.SaveData[0].cardsUsed;
+		}
+		else{
+			return 0;
+		}
+	};
+
+	this.addCardsUsed = function(value){
+		// Añade el valor de value a las cartas usadas
+		var x = this.getCardsUsed();
+		this.setCardsUsed(x+value);
+	};
+
+	this.setTotalTimePlayed = function(totalTimePlayed){
+		//Setea las cartas usadas
+		if(this.SaveData != null){
+			if(this.SaveData[0] == undefined){
+				this.SaveData[0] = {};
+			}
+			this.SaveData[0].totalTimePlayed = totalTimePlayed;
+		}
+		this.saveGame();
+	};
+	
+	this.getTotalTimePlayed = function(){
+		//Obtiene el tiempo total jugado
+		if(this.SaveData != null){
+			if(this.SaveData[0] == undefined || this.SaveData[0].totalTimePlayed == undefined){
+				return 0;
+			}
+			return this.SaveData[0].totalTimePlayed;
+		}
+		else{
+			return 0;
+		}
+	};
+
+	this.addTotalTimePlayed = function(value){
+		// Añade el valor de value a la cantidad de tiempo total jugado
+		var x = this.getTotalTimePlayed();
+		this.setTotalTimePlayed(x+value);
+	};
 
 }

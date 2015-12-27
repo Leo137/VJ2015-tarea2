@@ -48,6 +48,9 @@ preload: function() {
     // Load things..
 },
 create: function() {
+
+    SaveManager.addTimesPlayed(1);
+
     capture1P = 0;
     capture2P = 0;
     destroyed1P = false;

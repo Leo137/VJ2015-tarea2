@@ -42,6 +42,7 @@ preload: function() {
     game.load.image('card_tunnel_blue', 'assets/sprites/card_tunnel_blue.png');
     game.load.image('tiger', 'assets/sprites/tiger.png');
     game.load.image('elephant', 'assets/sprites/Elephant.png');
+    game.load.image('questionBackground','assets/sprites/questionBackground.png');
     game.load.tilemap('level_'+levelNumber.toString(), 'assets/maps/'+levelNumber+'.json', null, Phaser.Tilemap.TILED_JSON);
 	game.load.audio('ageofempires','assets/bgm/AoEIIIMainTheme.mp3');
 
@@ -136,7 +137,7 @@ create: function() {
     this.menuText.stroke =  'black';
     this.menuText.strokeThickness=2;
     this.menuText.inputEnabled = true;
-    this.menuText.events.onInputDown.add(this.toMenu, this);
+    this.menuText.events.onInputDown.add(this.toMenuQuestion, this);
 
     //this.map.setCollisionBetween(0,900);
     
@@ -376,7 +377,58 @@ finishTurn: function(){
         this.toGameover();
     }
 },
+toMenuDestroy: function(){
+    fx.play('button_click');
+    if(this.menuQuestion != null){
+        this.menuQuestion.destroy();
+        this.menuQuestion = null;
+    }
+},
+toMenuQuestion: function(){
+    fx.play('button_click');
+    if(this.menuQuestion == null){
+    this.menuQuestion = game.add.group();
+
+    this.menuQuestionBackground = new Phaser.Sprite(game,0,0,'questionBackground');
+    this.menuQuestionBackground.width = game.width/3;
+    this.menuQuestionBackground.height = game.height/3;
+    this.menuQuestionBackground.anchor.setTo(0.5);
+
+    this.menuOptionPrompt = new Phaser.Text(game,0,-20, "Go to menu?", { font: "bold 24px Arial", fill: "#FFFFFF" });
+    this.menuOptionPrompt.anchor.set(0.5);
+    this.menuOptionPrompt.stroke =  'black';
+    this.menuOptionPrompt.strokeThickness=2;    
+
+    this.menuOptionYes = new Phaser.Text(game,40,20, "Yes", { font: "bold 24px Arial", fill: "#FFFFFF" });
+    this.menuOptionYes.anchor.set(0.5);
+    this.menuOptionYes.stroke =  'black';
+    this.menuOptionYes.strokeThickness=2;
+    this.menuOptionYes.inputEnabled = true;
+    this.menuOptionYes.events.onInputDown.add(this.toMenu, this);
+
+    this.menuOptionNo = new Phaser.Text(game,-40,20, "No", { font: "bold 24px Arial", fill: "#FFFFFF" });
+    this.menuOptionNo.anchor.set(0.5);
+    this.menuOptionNo.stroke =  'black';
+    this.menuOptionNo.strokeThickness=2;
+    this.menuOptionNo.inputEnabled = true;
+    this.menuOptionNo.events.onInputDown.add(this.toMenuDestroy, this);
+
+    this.menuQuestion.add(this.menuQuestionBackground);
+    this.menuQuestion.add(this.menuOptionPrompt);
+    this.menuQuestion.add(this.menuOptionNo);
+    this.menuQuestion.add(this.menuOptionYes);
+
+    this.menuQuestion.fixedToCamera = true;
+
+    this.menuQuestion.cameraOffset.x = game.width/2;
+    this.menuQuestion.cameraOffset.y = game.height/2;
+    }
+},
 toMenu: function(){
+    if(this.menuQuestion != null){
+        this.menuQuestion.destroy();
+        this.menuQuestion = null;
+    }
     fx.play('button_click');
     game.state.start('Menu');
     this.music.stop();

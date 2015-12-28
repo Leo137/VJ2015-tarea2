@@ -4,144 +4,153 @@ BasicGame.Stats.prototype = {
 	preload: function(){
 		this.menuBackground = new MenuBackground(game,0,0,game.width,game.height,'bg_pattern_color');
 		this.bg = game.add.sprite(0, 0, 'bg');
-        this.bg.anchor.setTo(0.0,0.0);
-        this.bg.width = game.width;
-        this.bg.height = game.height;
-        this.bg.tint = 0x777777;
+                this.bg.anchor.setTo(0.0,0.0);
+                this.bg.width = game.width;
+                this.bg.height = game.height;
+                this.bg.tint = 0x777777;
 
-        this.pieProgressPie = new PieProgress(game, game.width/2,game.height/2, 16, '#909090', 0);
+                this.pieProgressPie = new PieProgress(game, game.width/2,game.height/2, 16, '#909090', 0);
+                game.load.image('questionBackground','assets/sprites/questionBackground.png');
 	},
 	create: function(){
 		this.pieProgressPie.DestroyPie();
-        this.pieProgressPie = null;
+                this.pieProgressPie = null;
 
-        // Titulo
-        this.titleText = game.add.text(0, 20, 'Estadisticas', { font: "bold 44px Tahoma", fill: "#FFFFFF" });
-        this.titleText.x = 30;
-        this.titleText.stroke =  'grey';
-        this.titleText.strokeThickness=3;
-        this.titleText.anchor.setTo(0.0,0.0);
-        this.titleText.scale.setTo(1.0);
+                // Titulo
+                this.titleText = game.add.text(0, 20, 'Estadisticas', { font: "bold 44px Tahoma", fill: "#FFFFFF" });
+                this.titleText.x = 30;
+                this.titleText.stroke =  'grey';
+                this.titleText.strokeThickness=3;
+                this.titleText.anchor.setTo(0.0,0.0);
+                this.titleText.scale.setTo(1.0);
 
-        var grd = this.titleText.context.createLinearGradient(0, 0, 0, this.titleText.height);
-        //  Add in 2 color stops
-        grd.addColorStop(0, '#FCFC34');   
-        grd.addColorStop(1, '#B0B001');
-        //  And apply to the Text
-        this.titleText.fill = grd;
+                var grd = this.titleText.context.createLinearGradient(0, 0, 0, this.titleText.height);
+                //  Add in 2 color stops
+                grd.addColorStop(0, '#FCFC34');   
+                grd.addColorStop(1, '#B0B001');
+                //  And apply to the Text
+                this.titleText.fill = grd;
 
-        // Status Group
-        this.statsGroup = game.add.group();
+                // Status Group
+                this.statsGroup = game.add.group();
 
-        // Games played
-        this.gamesPlayedText = new Phaser.Text(game,300, 80, 'Partidas jugadas:', { font: "bold 20px Tahoma", fill: "#FFFFFF" });
-        this.gamesPlayedText.stroke =  'grey';
-        this.gamesPlayedText.strokeThickness=3;
-        this.gamesPlayedText.anchor.setTo(1.0,0.0);
-        this.gamesPlayedText.scale.setTo(1.0);
+                this.statsGroup.x = 150;
+                this.statsGroup.y = 60;
 
-        this.gamesPlayedValueText = new Phaser.Text(game,310, 80, '0', { font: "bold 20px Tahoma", fill: "#FFFFFF" });
-        this.gamesPlayedValueText.stroke =  'grey';
-        this.gamesPlayedValueText.strokeThickness=3;
-        this.gamesPlayedValueText.anchor.setTo(0.0,0.0);
-        this.gamesPlayedValueText.scale.setTo(1.0);
+                this.statsGroupBackground = new Phaser.Sprite(game,10,10,'questionBackground');
+                this.statsGroupBackground.width = 450;
+                this.statsGroupBackground.height = 300;
 
-        this.gamesPlayedValueText.text = SaveManager.getTimesPlayed();
+                // Games played
+                this.gamesPlayedText = new Phaser.Text(game,300, 80, 'Partidas jugadas:', { font: "bold 20px Tahoma", fill: "#FFFFFF" });
+                this.gamesPlayedText.stroke =  'grey';
+                this.gamesPlayedText.strokeThickness=3;
+                this.gamesPlayedText.anchor.setTo(1.0,0.0);
+                this.gamesPlayedText.scale.setTo(1.0);
 
-        // Victorias Jugador 1
-        this.winsPlayer1Text = new Phaser.Text(game,300, 100, 'Victorias jugador 1:', { font: "bold 20px Tahoma", fill: "#FFFFFF" });
-        this.winsPlayer1Text.stroke =  'grey';
-        this.winsPlayer1Text.strokeThickness=3;
-        this.winsPlayer1Text.anchor.setTo(1.0,0.0);
-        this.winsPlayer1Text.scale.setTo(1.0);
+                this.gamesPlayedValueText = new Phaser.Text(game,310, 80, '0', { font: "bold 20px Tahoma", fill: "#FFFFFF" });
+                this.gamesPlayedValueText.stroke =  'grey';
+                this.gamesPlayedValueText.strokeThickness=3;
+                this.gamesPlayedValueText.anchor.setTo(0.0,0.0);
+                this.gamesPlayedValueText.scale.setTo(1.0);
 
-        this.winsPlayer1ValueText = new Phaser.Text(game,310, 100, '0', { font: "bold 20px Tahoma", fill: "#FFFFFF" });
-        this.winsPlayer1ValueText.stroke =  'grey';
-        this.winsPlayer1ValueText.strokeThickness=3;
-        this.winsPlayer1ValueText.anchor.setTo(0.0,0.0);
-        this.winsPlayer1ValueText.scale.setTo(1.0);
+                this.gamesPlayedValueText.text = SaveManager.getTimesPlayed();
 
-        this.winsPlayer1ValueText.text = SaveManager.getP1Wins();
+                // Victorias Jugador 1
+                this.winsPlayer1Text = new Phaser.Text(game,300, 100, 'Victorias jugador 1:', { font: "bold 20px Tahoma", fill: "#FFFFFF" });
+                this.winsPlayer1Text.stroke =  'grey';
+                this.winsPlayer1Text.strokeThickness=3;
+                this.winsPlayer1Text.anchor.setTo(1.0,0.0);
+                this.winsPlayer1Text.scale.setTo(1.0);
 
-        // Victorias Jugador 2
-        this.winsPlayer2Text = new Phaser.Text(game,300, 120, 'Victorias jugador 2:', { font: "bold 20px Tahoma", fill: "#FFFFFF" });
-        this.winsPlayer2Text.stroke =  'grey';
-        this.winsPlayer2Text.strokeThickness=3;
-        this.winsPlayer2Text.anchor.setTo(1.0,0.0);
-        this.winsPlayer2Text.scale.setTo(1.0);
+                this.winsPlayer1ValueText = new Phaser.Text(game,310, 100, '0', { font: "bold 20px Tahoma", fill: "#FFFFFF" });
+                this.winsPlayer1ValueText.stroke =  'grey';
+                this.winsPlayer1ValueText.strokeThickness=3;
+                this.winsPlayer1ValueText.anchor.setTo(0.0,0.0);
+                this.winsPlayer1ValueText.scale.setTo(1.0);
 
-        this.winsPlayer2ValueText = new Phaser.Text(game,310, 120, '0', { font: "bold 20px Tahoma", fill: "#FFFFFF" });
-        this.winsPlayer2ValueText.stroke =  'grey';
-        this.winsPlayer2ValueText.strokeThickness=3;
-        this.winsPlayer2ValueText.anchor.setTo(0.0,0.0);
-        this.winsPlayer2ValueText.scale.setTo(1.0);
+                this.winsPlayer1ValueText.text = SaveManager.getP1Wins();
 
-        this.winsPlayer2ValueText.text = SaveManager.getP2Wins();
+                // Victorias Jugador 2
+                this.winsPlayer2Text = new Phaser.Text(game,300, 120, 'Victorias jugador 2:', { font: "bold 20px Tahoma", fill: "#FFFFFF" });
+                this.winsPlayer2Text.stroke =  'grey';
+                this.winsPlayer2Text.strokeThickness=3;
+                this.winsPlayer2Text.anchor.setTo(1.0,0.0);
+                this.winsPlayer2Text.scale.setTo(1.0);
 
-        // Empates
-        this.tiesText = new Phaser.Text(game,300, 140, 'Empates:', { font: "bold 20px Tahoma", fill: "#FFFFFF" });
-        this.tiesText.stroke =  'grey';
-        this.tiesText.strokeThickness=3;
-        this.tiesText.anchor.setTo(1.0,0.0);
-        this.tiesText.scale.setTo(1.0);
+                this.winsPlayer2ValueText = new Phaser.Text(game,310, 120, '0', { font: "bold 20px Tahoma", fill: "#FFFFFF" });
+                this.winsPlayer2ValueText.stroke =  'grey';
+                this.winsPlayer2ValueText.strokeThickness=3;
+                this.winsPlayer2ValueText.anchor.setTo(0.0,0.0);
+                this.winsPlayer2ValueText.scale.setTo(1.0);
 
-        this.tiesValueText = new Phaser.Text(game,310, 140, '0', { font: "bold 20px Tahoma", fill: "#FFFFFF" });
-        this.tiesValueText.stroke =  'grey';
-        this.tiesValueText.strokeThickness=3;
-        this.tiesValueText.anchor.setTo(0.0,0.0);
-        this.tiesValueText.scale.setTo(1.0);
+                this.winsPlayer2ValueText.text = SaveManager.getP2Wins();
 
-        this.tiesValueText.text = SaveManager.getTies();
+                // Empates
+                this.tiesText = new Phaser.Text(game,300, 140, 'Empates:', { font: "bold 20px Tahoma", fill: "#FFFFFF" });
+                this.tiesText.stroke =  'grey';
+                this.tiesText.strokeThickness=3;
+                this.tiesText.anchor.setTo(1.0,0.0);
+                this.tiesText.scale.setTo(1.0);
 
-        // Cartas usadas
-        this.cardsUsed = new Phaser.Text(game,300, 160, 'Cartas usadas:', { font: "bold 20px Tahoma", fill: "#FFFFFF" });
-        this.cardsUsed.stroke =  'grey';
-        this.cardsUsed.strokeThickness=3;
-        this.cardsUsed.anchor.setTo(1.0,0.0);
-        this.cardsUsed.scale.setTo(1.0);
+                this.tiesValueText = new Phaser.Text(game,310, 140, '0', { font: "bold 20px Tahoma", fill: "#FFFFFF" });
+                this.tiesValueText.stroke =  'grey';
+                this.tiesValueText.strokeThickness=3;
+                this.tiesValueText.anchor.setTo(0.0,0.0);
+                this.tiesValueText.scale.setTo(1.0);
 
-        this.cardsValueUsed = new Phaser.Text(game,310, 160, '0', { font: "bold 20px Tahoma", fill: "#FFFFFF" });
-        this.cardsValueUsed.stroke =  'grey';
-        this.cardsValueUsed.strokeThickness=3;
-        this.cardsValueUsed.anchor.setTo(0.0,0.0);
-        this.cardsValueUsed.scale.setTo(1.0);
+                this.tiesValueText.text = SaveManager.getTies();
 
-        this.cardsValueUsed.text = SaveManager.getCardsUsed();
+                // Cartas usadas
+                this.cardsUsed = new Phaser.Text(game,300, 160, 'Cartas usadas:', { font: "bold 20px Tahoma", fill: "#FFFFFF" });
+                this.cardsUsed.stroke =  'grey';
+                this.cardsUsed.strokeThickness=3;
+                this.cardsUsed.anchor.setTo(1.0,0.0);
+                this.cardsUsed.scale.setTo(1.0);
 
-        // Tiempo total jugado
-        this.totalTimePlayedText = new Phaser.Text(game,300, 180, 'Tiempo total jugado:', { font: "bold 20px Tahoma", fill: "#FFFFFF" });
-        this.totalTimePlayedText.stroke =  'grey';
-        this.totalTimePlayedText.strokeThickness=3;
-        this.totalTimePlayedText.anchor.setTo(1.0,0.0);
-        this.totalTimePlayedText.scale.setTo(1.0);
+                this.cardsValueUsed = new Phaser.Text(game,310, 160, '0', { font: "bold 20px Tahoma", fill: "#FFFFFF" });
+                this.cardsValueUsed.stroke =  'grey';
+                this.cardsValueUsed.strokeThickness=3;
+                this.cardsValueUsed.anchor.setTo(0.0,0.0);
+                this.cardsValueUsed.scale.setTo(1.0);
 
-        this.totalTimePlayedValueText = new Phaser.Text(game,310, 180, '00:00:00', { font: "bold 20px Tahoma", fill: "#FFFFFF" });
-        this.totalTimePlayedValueText.stroke =  'grey';
-        this.totalTimePlayedValueText.strokeThickness=3;
-        this.totalTimePlayedValueText.anchor.setTo(0.0,0.0);
-        this.totalTimePlayedValueText.scale.setTo(1.0);
+                this.cardsValueUsed.text = SaveManager.getCardsUsed();
 
-        this.totalTimePlayedValueText.text = SaveManager.getTotalTimePlayed();
+                // Tiempo total jugado
+                this.totalTimePlayedText = new Phaser.Text(game,300, 180, 'Tiempo total jugado:', { font: "bold 20px Tahoma", fill: "#FFFFFF" });
+                this.totalTimePlayedText.stroke =  'grey';
+                this.totalTimePlayedText.strokeThickness=3;
+                this.totalTimePlayedText.anchor.setTo(1.0,0.0);
+                this.totalTimePlayedText.scale.setTo(1.0);
 
-        this.statsGroup.add(this.gamesPlayedText);
-        this.statsGroup.add(this.gamesPlayedValueText);
-        this.statsGroup.add(this.winsPlayer1Text);
-        this.statsGroup.add(this.winsPlayer1ValueText);
-        this.statsGroup.add(this.winsPlayer2Text);
-        this.statsGroup.add(this.winsPlayer2ValueText);
-        this.statsGroup.add(this.tiesText);
-        this.statsGroup.add(this.tiesValueText);
-        this.statsGroup.add(this.cardsUsed);
-        this.statsGroup.add(this.cardsValueUsed);
-        this.statsGroup.add(this.totalTimePlayedText);
-        this.statsGroup.add(this.totalTimePlayedValueText);
+                this.totalTimePlayedValueText = new Phaser.Text(game,310, 180, '00:00:00', { font: "bold 20px Tahoma", fill: "#FFFFFF" });
+                this.totalTimePlayedValueText.stroke =  'grey';
+                this.totalTimePlayedValueText.strokeThickness=3;
+                this.totalTimePlayedValueText.anchor.setTo(0.0,0.0);
+                this.totalTimePlayedValueText.scale.setTo(1.0);
 
-        this.backText = game.add.text(0 + 30, game.height/2 + game.height/3, "Al Menu", { font: "bold 34px Arial", fill: "#FFFFFF" });
-        this.backText.anchor.set(0.0);
-        this.backText.stroke =  'black';
-        this.backText.strokeThickness=2;
-        this.backText.inputEnabled = true;
-        this.backText.events.onInputDown.add(this.toMenu, this);
+                this.totalTimePlayedValueText.text = SaveManager.getTotalTimePlayed();
+
+                this.statsGroup.add(this.statsGroupBackground);
+                this.statsGroup.add(this.gamesPlayedText);
+                this.statsGroup.add(this.gamesPlayedValueText);
+                this.statsGroup.add(this.winsPlayer1Text);
+                this.statsGroup.add(this.winsPlayer1ValueText);
+                this.statsGroup.add(this.winsPlayer2Text);
+                this.statsGroup.add(this.winsPlayer2ValueText);
+                this.statsGroup.add(this.tiesText);
+                this.statsGroup.add(this.tiesValueText);
+                this.statsGroup.add(this.cardsUsed);
+                this.statsGroup.add(this.cardsValueUsed);
+                this.statsGroup.add(this.totalTimePlayedText);
+                this.statsGroup.add(this.totalTimePlayedValueText);
+
+                this.backText = game.add.text(0 + 30, game.height/2 + game.height/3, "Al Menu", { font: "bold 34px Arial", fill: "#FFFFFF" });
+                this.backText.anchor.set(0.0);
+                this.backText.stroke =  'black';
+                this.backText.strokeThickness=2;
+                this.backText.inputEnabled = true;
+                this.backText.events.onInputDown.add(this.toMenu, this);
 	},
 	toMenu: function(){
 		fx.play('button_click');

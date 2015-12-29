@@ -4,6 +4,7 @@ var capture1P;
 var capture2P;
 var destroyed1P;
 var destroyed2P;
+var timeLeftPlayer = 30 * 1000;
 // the structure of the map
 var map;
 
@@ -58,6 +59,7 @@ create: function() {
     destroyed2P = false;
 	numeroTurnos = 1;
 
+    this.timer = new Timer(game,game.width-50,50);
 	this.music = game.add.audio('ageofempires');
     game.currentPlayer1P = true;
 	this.map = game.add.tilemap('level_'+levelNumber.toString());
@@ -131,13 +133,19 @@ create: function() {
     this.currentTurnText.stroke =  'black';
     this.currentTurnText.strokeThickness=2;
 
-    this.menuText = game.add.text(20, 60, "To Menu", { font: "bold 24px Arial", fill: "#FFFFFF" });
+    this.menuText = game.add.text(20, 90, "To Menu", { font: "bold 24px Arial", fill: "#FFFFFF" });
     this.menuText.anchor.set(0.0,0.0);
     this.menuText.fixedToCamera = true;
     this.menuText.stroke =  'black';
     this.menuText.strokeThickness=2;
     this.menuText.inputEnabled = true;
     this.menuText.events.onInputDown.add(this.toMenuQuestion, this);
+
+    this.timerText = game.add.text(20, 60, "Tiempo restante: 0", { font: "bold 24px Arial", fill: "#FFFFFF" });
+    this.timerText.anchor.set(0.0);
+    this.timerText.fixedToCamera = true;
+    this.timerText.stroke =  'black';
+    this.timerText.strokeThickness=2;
 
     //this.map.setCollisionBetween(0,900);
     
@@ -224,10 +232,16 @@ create: function() {
 
     this.startTurn();
 	this.music.play();
+    game.world.bringToTop(this.timer);
 },
 update: function() {
     if(game.isGamepaused){
         return;
+    }
+    this.timer.update();
+    this.timerText.setText("Tiempo restante: " + this.timer.text);
+    if(timeLeftPlayer <= 0){
+        this.finishTurn();
     }
     game.world.bringToTop(this.game_ui_group);
     // Update things ...
@@ -343,6 +357,9 @@ finishTurn: function(){
     if(!game.currentPlayer1P){
         this.actTiger();
     }
+    timeLeftPlayer = 30 * 1000;
+    this.timerText.setText("Tiempo restante: " + this.timer.text);
+    this.timer.update();
     this.processCapture();
     this.unitsGroup.finishTurn();
     this.cardGroup.finishTurn();

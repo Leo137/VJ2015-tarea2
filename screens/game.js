@@ -7,6 +7,10 @@ var destroyed2P;
 var timeLeftPlayer = 30 * 1000;
 // the structure of the map
 var map;
+var house;
+var fight;
+var tiger;
+var elephant;
 
 BasicGame.Game = function(){ }; 
 
@@ -46,6 +50,10 @@ preload: function() {
     game.load.image('questionBackground','assets/sprites/questionBackground.png');
     game.load.tilemap('level_'+levelNumber.toString(), 'assets/maps/'+levelNumber+'.json', null, Phaser.Tilemap.TILED_JSON);
 	game.load.audio('ageofempires','assets/bgm/AoEIIIMainTheme.mp3');
+	game.load.audio('house','assets/bgm/house.mp3');
+	game.load.audio('fight','assets/bgm/fight.mp3');
+	game.load.audio('tiger','assets/bgm/tiger.mp3');
+	game.load.audio('elephant','assets/bgm/elephant.mp3');
 
     // Load things..
 },
@@ -61,6 +69,11 @@ create: function() {
 
     this.timer = new Timer(game,game.width-50,50);
 	this.music = game.add.audio('ageofempires');
+	this.music.loop = true;
+	house=game.add.audio('house');
+	fight=game.add.audio('fight');
+	tiger=game.add.audio('tiger');
+	elephant=game.add.audio('elephant');
     game.currentPlayer1P = true;
 	this.map = game.add.tilemap('level_'+levelNumber.toString());
     this.map.addTilesetImage('map');
@@ -376,9 +389,11 @@ finishTurn: function(){
     this.unitsGroup.forEach(function(unit){
         if(unit.owner == 1){
             numberSoldiers1P++;
+			house.play();
         }
         else if (unit.owner == 2){
             numberSoldiers2P++;
+			house.play();
         }
     });
     if(numberSoldiers1P == 0){
@@ -497,6 +512,7 @@ handleAttack: function(){
                         unit.quantityText.destroy();
                         unit2.destroy();
                         unit.destroy();
+						fight.play();
                     }
                     else if (unitQuantity > unitQuantity2){
                         if(unitQuantity2 > 0)
@@ -504,6 +520,7 @@ handleAttack: function(){
                         unit.updateQuantityText();
                         unit2.quantityText.destroy();
                         unit2.destroy();
+						fight.play();
                     }
                     else if (unitQuantity2 > unitQuantity){
                         if(unitQuantity > 0)
@@ -511,6 +528,7 @@ handleAttack: function(){
                         unit2.updateQuantityText();
                         unit.quantityText.destroy();
                         unit.destroy();
+						fight.play();
                     }
                 }
             }
@@ -575,6 +593,7 @@ actTiger: function(){
                 if(Math.abs(unitTiger.x_/64 - unit.x_/64) <= 1 && Math.abs(unitTiger.y_/64 - unit.y_/64) <= 1){
                     unit.quantityText.destroy();
                     unit.destroy();
+					tiger.play();
                 }
             }
         });

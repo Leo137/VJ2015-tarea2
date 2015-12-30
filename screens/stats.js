@@ -129,7 +129,38 @@ BasicGame.Stats.prototype = {
                 this.totalTimePlayedValueText.anchor.setTo(0.0,0.0);
                 this.totalTimePlayedValueText.scale.setTo(1.0);
 
-                this.totalTimePlayedValueText.text = SaveManager.getTotalTimePlayed();
+                //Algoritmo para transformar de milisegundos a formato HH:MM:SS
+                millisecs = SaveManager.getTotalTimePlayed();
+                secs = Math.floor((millisecs / 1000) % 60);
+                minutes = Math.floor((millisecs / (1000 * 60)) % 60);
+                hours = Math.floor((millisecs / (1000 * 60 * 60)) % 24);
+
+                if(hours < 10 && minutes < 10 && secs < 10){
+                        this.totalTimePlayedValueText.text = "0" + hours + ":0" + minutes + ":0" + secs;
+                }
+                else if(hours < 10 && secs < 10){
+                        this.totalTimePlayedValueText.text = "0" + hours + ":" + minutes + ":0" + secs;
+
+                }
+                else if(hours < 10 && minutes < 10){
+                        this.totalTimePlayedValueText.text = "0" + hours + ":0" + minutes + ":" + secs;
+                }
+                else if(minutes < 10 && secs < 10){
+                        this.totalTimePlayedValueText.text = hours + ":0" + minutes + ":0" + secs;
+                }
+                else if(hours < 10){
+                        this.totalTimePlayedValueText.text = "0" + hours + ":" + minutes + ":" + secs;
+                }
+                else if(minutes < 10){
+                        this.totalTimePlayedValueText.text = hours + ":0" + minutes + ":" + secs;
+                }
+                else if(secs < 10){
+                        this.totalTimePlayedValueText.text = hours + ":" + minutes + ":0" + secs;
+                }
+                else{
+                        this.totalTimePlayedValueText.text = hours + ":" + minutes + ":" + secs;
+                }
+
 
                 this.statsGroup.add(this.statsGroupBackground);
                 this.statsGroup.add(this.gamesPlayedText);

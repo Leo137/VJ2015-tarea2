@@ -211,6 +211,7 @@ Card.prototype.onMovementPossibleCircleClicked = function(circle){
 		card.clearAllSelection();
 		cardGroup.destroyCard(card);
 		cardGroup.updateCardsPosition(game,owner);
+		SaveManager.addCardsUsed(1);
 	}
 	if(card.type == 2){
 		// Catapult effect
@@ -223,6 +224,7 @@ Card.prototype.onMovementPossibleCircleClicked = function(circle){
 		card.clearAllSelection();
 		cardGroup.destroyCard(card);
 		cardGroup.updateCardsPosition(game,owner);
+		SaveManager.addCardsUsed(1);
 	}
 	if(card.type == 3){
 		// Bridge Effect
@@ -256,6 +258,7 @@ Card.prototype.onMovementPossibleCircleClicked = function(circle){
 				}
 			}
 		}
+		SaveManager.addCardsUsed(1);
 	}
 }
 

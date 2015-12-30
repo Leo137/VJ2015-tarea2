@@ -4,13 +4,18 @@ var capture1P;
 var capture2P;
 var destroyed1P;
 var destroyed2P;
-var timeLeftPlayer = 30 * 1000;
+var timeLeftPlayer = 30;
+var timePlayed = 0;
 // the structure of the map
 var map;
 var house;
 var fight;
 var tiger;
 var elephant;
+
+var pausedLabel;
+var resumeGame;
+var toMenuText;
 
 BasicGame.Game = function(){ }; 
 
@@ -66,8 +71,9 @@ create: function() {
     destroyed1P = false;
     destroyed2P = false;
 	numeroTurnos = 1;
+    this.startedTime = game.time.now;
 
-    this.timer = new Timer(game,game.width-50,50);
+    game.time.events.loop(Phaser.Timer.SECOND, this.updateCounter, this);
 	this.music = game.add.audio('ageofempires');
 	this.music.loop = true;
 	house=game.add.audio('house');
@@ -160,6 +166,15 @@ create: function() {
     this.timerText.stroke =  'black';
     this.timerText.strokeThickness=2;
 
+    //Pause
+    this.pauseText = game.add.text(game.width - 20, 35, "Pause", { font: "bold 34px Arial", fill: "#FFFFFF" });
+    this.pauseText.anchor.set(1.0,0.0);
+    this.pauseText.fixedToCamera = true;
+    this.pauseText.stroke =  'black';
+    this.pauseText.strokeThickness=2;
+    this.pauseText.inputEnabled = true;
+    this.pauseText.events.onInputDown.add(this.pauseGame, this);
+
     //this.map.setCollisionBetween(0,900);
     
     this.layer.resizeWorld();
@@ -245,14 +260,13 @@ create: function() {
 
     this.startTurn();
 	this.music.play();
-    game.world.bringToTop(this.timer);
 },
 update: function() {
     if(game.isGamepaused){
         return;
     }
-    this.timer.update();
-    this.timerText.setText("Tiempo restante: " + this.timer.text);
+    this.timerText.setText("Tiempo restante: " + timeLeftPlayer);
+    
     if(timeLeftPlayer <= 0){
         this.finishTurn();
     }
@@ -370,9 +384,8 @@ finishTurn: function(){
     if(!game.currentPlayer1P){
         this.actTiger();
     }
-    timeLeftPlayer = 30 * 1000;
-    this.timerText.setText("Tiempo restante: " + this.timer.text);
-    this.timer.update();
+    timeLeftPlayer = 30;
+    this.timerText.setText("Tiempo restante: " + timeLeftPlayer);
     this.processCapture();
     this.unitsGroup.finishTurn();
     this.cardGroup.finishTurn();
@@ -397,15 +410,18 @@ finishTurn: function(){
         }
     });
     if(numberSoldiers1P == 0){
+        timePlayed = game.time.now - this.startedTime;
         destroyed1P = true;
         this.toGameover();
     }
     else if (numberSoldiers2P == 0){
+        timePlayed = game.time.now - this.startedTime;
         destroyed2P = true;
         this.toGameover();
     }
     //Comprueba si ambos jugadores ya realizaron sus 100 turnos.
-    else if(numeroTurnos == 81){
+    else if(numeroTurnos == 11){
+        timePlayed = game.time.now - this.startedTime;
         this.toGameover();
     }
 },
@@ -605,15 +621,48 @@ muteGame: function(){
     statusbarGroup.statusbar_sound_icon.loadTexture(game.sound.mute ? 'sound_off' : 'sound_on', 0);
 },
 pauseGame: function(){
-    game.isGamepaused = !game.isGamepaused;
-    fx.play('button_click');
-    if(game.isGamepaused){
-        game.tweens.pauseAll();
-        game.time.events.pause();
+    game.paused = true;
+    pausedLabel = game.add.text(game.camera.x + 300, game.camera.y + 150, "Paused", { font: "bold 24px Arial", fill: "#FFFFFF", align: "center"});
+    pausedLabel.anchor.setTo(0.0, 0.0);
+    pausedLabel.fixedToCamera = true;
+    pausedLabel.stroke =  'black';
+    pausedLabel.strokeThickness=2;
+
+    resumeGame = game.add.text(game.camera.x + 300, game.camera.y + 180, "Reaundar partida", { font: "bold 24px Arial", fill: "#FFFFFF", align: "center"});
+    resumeGame.anchor.setTo(0.0, 0.0);
+    resumeGame.fixedToCamera = true;
+    resumeGame.stroke =  'black';
+    resumeGame.strokeThickness=2;
+
+    toMenuText = game.add.text(game.camera.x + 300, game.camera.y + 210, "Volver a Menu", { font: "bold 24px Arial", fill: "#FFFFFF", align: "center"});
+    toMenuText.anchor.setTo(0.0, 0.0);
+    toMenuText.fixedToCamera = true;
+    toMenuText.stroke =  'black';
+    toMenuText.strokeThickness=2;
+
+    game.input.onDown.add(this.unpause, self);
+},
+
+unpause: function(event){
+    // Only act if paused
+    if(game.paused){
+        // Calculate the corners of the menu
+            pausedLabel.destroy();
+            toMenuText.destroy();
+            resumeGame.destroy();
+
+            // Unpause the game
+            game.paused = false;
     }
-    else{
-        game.tweens.resumeAll();
-        game.time.events.resume();
+},
+updateCounter: function() {
+    timeLeftPlayer--;
+    this.timerText.setText("Tiempo restante: " + timeLeftPlayer);
+
+    if(timeLeftPlayer <= 0){
+        this.finishTurn();
     }
+
 }
+
 }

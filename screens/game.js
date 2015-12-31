@@ -4,18 +4,14 @@ var capture1P;
 var capture2P;
 var destroyed1P;
 var destroyed2P;
-var timeLeftPlayer = 30;
-var timePlayed = 0;
+var timeLeftPlayer;
+var timePlayed;
 // the structure of the map
 var map;
 var house;
 var fight;
 var tiger;
 var elephant;
-
-var pausedLabel;
-var resumeGame;
-var toMenuText;
 
 BasicGame.Game = function(){ }; 
 
@@ -41,6 +37,7 @@ preload: function() {
     //this.setLoadingText();
     game.time.advancedTiming = true;
     game.load.image('map', 'assets/tiles/tilemap.png');
+    game.load.image('blank', 'assets/sprites/blank.png');
     game.load.image('arrow_h', 'assets/sprites/arrow_h.png');
     game.load.image('arrow_v', 'assets/sprites/arrow_v.png');
     game.load.image('player_unit', 'assets/sprites/player_unit.png');
@@ -65,7 +62,9 @@ preload: function() {
 create: function() {
 
     SaveManager.addTimesPlayed(1);
-
+    game.softPaused = false;
+    timePlayed = 0;
+    timeLeftPlayer = 30;
     capture1P = 0;
     capture2P = 0;
     destroyed1P = false;
@@ -152,14 +151,6 @@ create: function() {
     this.currentTurnText.stroke =  'black';
     this.currentTurnText.strokeThickness=2;
 
-    this.menuText = game.add.text(20, 90, "To Menu", { font: "bold 24px Arial", fill: "#FFFFFF" });
-    this.menuText.anchor.set(0.0,0.0);
-    this.menuText.fixedToCamera = true;
-    this.menuText.stroke =  'black';
-    this.menuText.strokeThickness=2;
-    this.menuText.inputEnabled = true;
-    this.menuText.events.onInputDown.add(this.toMenuQuestion, this);
-
     this.timerText = game.add.text(20, 60, "Tiempo restante: 0", { font: "bold 24px Arial", fill: "#FFFFFF" });
     this.timerText.anchor.set(0.0);
     this.timerText.fixedToCamera = true;
@@ -173,7 +164,7 @@ create: function() {
     this.pauseText.stroke =  'black';
     this.pauseText.strokeThickness=2;
     this.pauseText.inputEnabled = true;
-    this.pauseText.events.onInputDown.add(this.pauseGame, this);
+    this.pauseText.events.onInputDown.add(this.togglePause, this);
 
     //this.map.setCollisionBetween(0,900);
     
@@ -215,7 +206,6 @@ create: function() {
     this.game_ui_group.add(this.downArrow);
     this.game_ui_group.add(this.leftArrow);
     this.game_ui_group.add(this.rightArrow);
-    this.game_ui_group.add(this.menuText);
     this.game_ui_group.add(this.finishTurnText);
     this.game_ui_group.add(this.currentTurnText);
     this.game_ui_group.add(this.captureStatsText);
@@ -271,6 +261,12 @@ update: function() {
         this.finishTurn();
     }
     game.world.bringToTop(this.game_ui_group);
+    if(this.pauseMenu != null){
+        game.world.bringToTop(this.pauseMenu);
+    }
+    if(this.menuQuestion != null){
+        game.world.bringToTop(this.menuQuestion);
+    }
     // Update things ...
 },
 updateCurrentTurnText: function(){
@@ -306,6 +302,9 @@ tweenToCurrentCastlePlayer: function(){
 },
 upArrowPressed: function(){
     fx.play('button_click');
+    if(game.softPaused){
+        return;
+    }
     if(game.camera.y >= 64){
         //game.camera.y -= 64;
         this.game.add.tween(this.game.camera).to( {y: game.camera.y - 64}
@@ -321,6 +320,9 @@ upArrowPressed: function(){
 },
 downArrowPressed: function(){
     fx.play('button_click');
+    if(game.softPaused){
+        return;
+    }
     if(game.camera.y <= 20*64 - 64){
         //game.camera.y += 64;
         this.game.add.tween(this.game.camera).to( {y: game.camera.y + 64}
@@ -335,6 +337,9 @@ downArrowPressed: function(){
 },
 leftArrowPressed: function(){
     fx.play('button_click');
+    if(game.softPaused){
+        return;
+    }
     if(game.camera.x >= 64){
         //game.camera.x -= 64;
         this.game.add.tween(this.game.camera).to( {x: game.camera.x - 64}
@@ -349,6 +354,9 @@ leftArrowPressed: function(){
 },
 rightArrowPressed: function(){
     fx.play('button_click');
+    if(game.softPaused){
+        return;
+    }
     if(game.camera.x <= 15*64 - 64){
         //game.camera.x += 64;
         this.game.add.tween(this.game.camera).to( {x: game.camera.x + 64}
@@ -377,6 +385,9 @@ createUnit: function(game,mapx,mapy,owner){
 },
 finishTurn: function(){
     fx.play('button_click');
+    if(game.softPaused){
+        return;
+    }
     if(!game.currentPlayer1P){
         this.currentTurn += 1;
     }
@@ -620,42 +631,75 @@ muteGame: function(){
     fx.play('button_click'); 
     statusbarGroup.statusbar_sound_icon.loadTexture(game.sound.mute ? 'sound_off' : 'sound_on', 0);
 },
-pauseGame: function(){
-    game.paused = true;
-    pausedLabel = game.add.text(game.camera.x + 300, game.camera.y + 150, "Paused", { font: "bold 24px Arial", fill: "#FFFFFF", align: "center"});
-    pausedLabel.anchor.setTo(0.0, 0.0);
-    pausedLabel.fixedToCamera = true;
-    pausedLabel.stroke =  'black';
-    pausedLabel.strokeThickness=2;
+togglePause: function(){
 
-    resumeGame = game.add.text(game.camera.x + 300, game.camera.y + 180, "Reaundar partida", { font: "bold 24px Arial", fill: "#FFFFFF", align: "center"});
-    resumeGame.anchor.setTo(0.0, 0.0);
-    resumeGame.fixedToCamera = true;
-    resumeGame.stroke =  'black';
-    resumeGame.strokeThickness=2;
+    fx.play('button_click');
 
-    toMenuText = game.add.text(game.camera.x + 300, game.camera.y + 210, "Volver a Menu", { font: "bold 24px Arial", fill: "#FFFFFF", align: "center"});
-    toMenuText.anchor.setTo(0.0, 0.0);
-    toMenuText.fixedToCamera = true;
-    toMenuText.stroke =  'black';
-    toMenuText.strokeThickness=2;
+    if(game.softPaused){
+        // Unpause the game
+        game.softPaused = false;
 
-    game.input.onDown.add(this.unpause, self);
-},
-
-unpause: function(event){
-    // Only act if paused
-    if(game.paused){
-        // Calculate the corners of the menu
-            pausedLabel.destroy();
-            toMenuText.destroy();
-            resumeGame.destroy();
-
-            // Unpause the game
-            game.paused = false;
+        // Destroy pauseMenu
+        if(this.pauseMenu != null){
+            this.pauseMenu.destroy();
+        }
     }
+    else{
+        // Pause the game
+        game.softPaused = true;
+        
+        // Show labels and stuff
+        this.pauseMenu = game.add.group();
+
+        this.pauseDarkUnderlay = new Phaser.Sprite(game,0,0,'blank');
+        this.pauseDarkUnderlay.width = game.width;
+        this.pauseDarkUnderlay.height = game.height;
+        this.pauseDarkUnderlay.tint = 0x202020;
+        this.pauseDarkUnderlay.alpha = 0.5;
+        this.pauseDarkUnderlay.anchor.setTo(0.5);
+        this.pauseDarkUnderlay.inputEnabled = true;
+
+        this.pauseMenuBackground = new Phaser.Sprite(game,0,0,'questionBackground');
+        this.pauseMenuBackground.width = game.width/3;
+        this.pauseMenuBackground.height = game.height/3;
+        this.pauseMenuBackground.anchor.setTo(0.5);
+
+        this.pausedLabel = new Phaser.Text(game,0, -35, "Paused", { font: "bold 24px Arial", fill: "#FFFFFF", align: "center"});
+        this.pausedLabel.anchor.setTo(0.5, 0.5);
+        this.pausedLabel.stroke =  'black';
+        this.pausedLabel.strokeThickness=2;
+
+        this.resumeGame = new Phaser.Text(game,0, 0, "Reaundar partida", { font: "bold 24px Arial", fill: "#FFFFFF", align: "center"});
+        this.resumeGame.anchor.setTo(0.5, 0.5);
+        this.resumeGame.stroke =  'black';
+        this.resumeGame.strokeThickness=2;
+        this.resumeGame.inputEnabled = true;
+        this.resumeGame.events.onInputDown.add(this.togglePause, this);
+
+        this.toMenuText = new Phaser.Text(game,0, 30, "Volver a Menu", { font: "bold 24px Arial", fill: "#FFFFFF", align: "center"});
+        this.toMenuText.anchor.setTo(0.5, 0.5);
+        this.toMenuText.stroke =  'black';
+        this.toMenuText.strokeThickness=2;
+        this.toMenuText.inputEnabled = true;
+        this.toMenuText.events.onInputDown.add(this.toMenuQuestion, this);
+
+        this.pauseMenu.add(this.pauseDarkUnderlay);
+        this.pauseMenu.add(this.pauseMenuBackground);
+        this.pauseMenu.add(this.pausedLabel);
+        this.pauseMenu.add(this.resumeGame);
+        this.pauseMenu.add(this.toMenuText);
+
+        this.pauseMenu.fixedToCamera = true;
+
+        this.pauseMenu.cameraOffset.x = game.width/2;
+        this.pauseMenu.cameraOffset.y = game.height/2;
+    }
+    
 },
 updateCounter: function() {
+    if(game.softPaused){
+        return;
+    }
     timeLeftPlayer--;
     this.timerText.setText("Tiempo restante: " + timeLeftPlayer);
 

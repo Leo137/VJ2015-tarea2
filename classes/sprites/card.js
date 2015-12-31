@@ -60,6 +60,9 @@ Card.prototype.onCardClicked = function(){
 		return;
 	}
 	fx.play('button_click');
+	if(game.softPaused){
+        return;
+    }
 	if(this.actionPossibleGroup.length > 0){
 		this.clearAllSelection();
 		return;
@@ -188,6 +191,9 @@ Card.prototype.createActionPossibleCircle = function(tilex,tiley){
 
 Card.prototype.onMovementPossibleCircleClicked = function(circle){
 	fx.play('button_click');
+	if(game.softPaused){
+        return;
+    }
 	var card = circle.card;
 	var cardGroup = card.cardGroup;
 	var owner = card.owner;
@@ -258,7 +264,6 @@ Card.prototype.onMovementPossibleCircleClicked = function(circle){
 				}
 			}
 		}
-		SaveManager.addCardsUsed(1);
 	}
 }
 
@@ -286,6 +291,9 @@ Card.prototype.createActionPossibleCircleTunnel = function(tilex,tiley,cir){
 
 Card.prototype.onMovementPossibleCircleClickedTunnel = function(circle){
 	fx.play('button_click');
+	if(game.softPaused){
+        return;
+    }
 	var card = circle.card;
 	var cardGroup = card.cardGroup;
 	var owner = card.owner;
@@ -325,5 +333,6 @@ Card.prototype.onMovementPossibleCircleClickedTunnel = function(circle){
 		card.clearAllSelection();
 		cardGroup.destroyCard(card);
 		cardGroup.updateCardsPosition(game,owner);
+		SaveManager.addCardsUsed(1);
 	}
 }

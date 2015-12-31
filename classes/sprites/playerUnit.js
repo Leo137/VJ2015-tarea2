@@ -86,6 +86,9 @@ PlayerUnit.prototype.onUnitClicked = function(){
 		return;
 	}
 	fx.play('button_click');
+	if(game.softPaused){
+        return;
+    }
 	if(this.canAct){
 		if(this.movementPossibleGroup.length > 0){
 			this.clearAllSelection();

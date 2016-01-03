@@ -97,27 +97,49 @@ create: function() {
 	var seed = Math.floor((0.5-Math.random())*(2)+8);
     var rio=4;
 	var t1=seed;
-	
+	var anterior=t1;
 	this.map.putTile(rio,seed,0,this.layer); //inicio siempre hacia abajo
 	for (var z = 1; z < 20; z++){
-		t2=Math.random();
-		if(t2>2*third){
-			t1=t1+1;
-			if(t1>11) //limita movimiento a la derecha
-				t1=11;
-			this.map.putTile(29,t1-1,z,this.layer);
-			this.map.putTile(22,t1,z,this.layer); //este tile no quiere cargar
-		}
-		if(t2<third){
-			t1=t1-1;
-			if(t1<4) //limita movimiento a la izquierda
-				t1=4;
+		t2=Math.random(); //dirección del rio
+		if(anterior==10){//si anterior se fue al tope derecha
+			t1=t1-1;	
 			this.map.putTile(36,t1+1,z,this.layer);
 			this.map.putTile(37,t1,z,this.layer);
 		}
 		else{
-			this.map.putTile(rio,t1,z,this.layer);
+			if(anterior==3){//si anterior se fue al tope izquierda
+				t1=t1+1;
+				this.map.putTile(29,t1-1,z,this.layer);
+				this.map.putTile(22,t1,z,this.layer);
+			}
+			else{
+				if(t2>2*third){
+					t1=t1+1;
+					if(t1>10) //limita movimiento a la derecha
+						t1=10;
+					this.map.putTile(29,t1-1,z,this.layer);
+					this.map.putTile(22,t1,z,this.layer);
+					if(t2>0.8)
+						this.map.putTile(15,t1-2,z,this.layer);
+				}
+				else{
+					if(t2<third){
+						t1=t1-1;
+						if(t1<3) //limita movimiento a la izquierda
+							t1=3;
+						this.map.putTile(36,t1+1,z,this.layer);
+						this.map.putTile(37,t1,z,this.layer);
+						if(t2<0.2)
+							this.map.putTile(15,t1+2,z,this.layer);
+					}
+					else{
+						this.map.putTile(rio,t1,z,this.layer);
+					}
+					
+				}
+			}
 		}
+	anterior=t1;	
 	}
 /*
     for (var y = 0; y < 20; y++){

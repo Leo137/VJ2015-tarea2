@@ -473,7 +473,7 @@ finishTurn: function(){
         this.toGameover();
     }
     //Comprueba si ambos jugadores ya realizaron sus 100 turnos.
-    else if(numeroTurnos == 11){
+    else if(numeroTurnos == 81){
         timePlayed = game.time.now - this.startedTime;
         this.toGameover();
     }
@@ -660,9 +660,25 @@ actTiger: function(){
             if(unitTiger.owner == 3 && unit.owner != 3){
                 //console.log(Phaser.Math.distance(unitTiger.x_/64, unit.x_/64, unitTiger.y_/64, unit.y_/64));
                 if(Math.abs(unitTiger.x_/64 - unit.x_/64) <= 1 && Math.abs(unitTiger.y_/64 - unit.y_/64) <= 1){
-                    unit.quantityText.destroy();
-                    unit.destroy();
-					tiger.play();
+                    if(unitTiger.quantity > unit.quantity){
+                        unitTiger.quantity -= unit.quantity;
+                        unitTiger.updateQuantityText();
+                        unit.quantityText.destroy();
+                        unit.destroy();
+    					tiger.play();
+                    }
+                    else if(unitTiger.quantity == unit.quantity){
+                        unit.quantityText.destroy();
+                        unit.destroy();
+                        unitTiger.quantityText.destroy();
+                        unitTiger.destroy();
+                    }
+                    else{
+                        unit.quantity -= unitTiger.quantity;
+                        unit.updateQuantityText();
+                        unitTiger.quantityText.destroy();
+                        unitTiger.destroy();
+                    }
                 }
             }
         });

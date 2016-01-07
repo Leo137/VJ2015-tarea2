@@ -84,89 +84,6 @@ create: function() {
     this.map.addTilesetImage('map');
 	this.layer = this.map.createLayer('Capa de Patrones 1');
 	
-	//vaciar mapa
-	/*
-	for (var y = 0; y < 20; y++)
-		for (var x = 0; x < 20; x++)		
-			this.map.putTile(1,x,y,this.layer); 
-	*/
-	//crear rio
-    var t1;
-    var t2;
-    var third=1/3;
-	var seed = Math.floor((0.5-Math.random())*(2)+8);
-    var rio=4;
-	var t1=seed;
-	var anterior=t1;
-	this.map.putTile(rio,seed,0,this.layer); //inicio siempre hacia abajo
-	for (var z = 1; z < 20; z++){
-		t2=Math.random(); //dirección del rio
-		if(anterior==10){//si anterior se fue al tope derecha
-			t1=t1-1;	
-			this.map.putTile(36,t1+1,z,this.layer);
-			this.map.putTile(37,t1,z,this.layer);
-		}
-		else{
-			if(anterior==3){//si anterior se fue al tope izquierda
-				t1=t1+1;
-				this.map.putTile(29,t1-1,z,this.layer);
-				this.map.putTile(22,t1,z,this.layer);
-			}
-			else{
-				if(t2>2*third){
-					t1=t1+1;
-					if(t1>10) //limita movimiento a la derecha
-						t1=10;
-					this.map.putTile(29,t1-1,z,this.layer);
-					this.map.putTile(22,t1,z,this.layer);
-					if(t2>0.8)
-						this.map.putTile(15,t1-2,z,this.layer);
-				}
-				else{
-					if(t2<third){
-						t1=t1-1;
-						if(t1<3) //limita movimiento a la izquierda
-							t1=3;
-						this.map.putTile(36,t1+1,z,this.layer);
-						this.map.putTile(37,t1,z,this.layer);
-						if(t2<0.2)
-							this.map.putTile(15,t1+2,z,this.layer);
-					}
-					else{
-						this.map.putTile(rio,t1,z,this.layer);
-					}
-					
-				}
-			}
-		}
-	anterior=t1;	
-	}
-/*
-    for (var y = 0; y < 20; y++){
-        for (var x = 0; x < 15; x++){
-            if(x > 3 && x < 12){
-                var t2=Math.random();
-                if(Math.abs(x-seed) == 1){
-                    if(t2 < third/1.5){
-                        this.map.putTile(15,x,y,this.layer);
-                    }
-                }
-                else{
-                    if(seed != x){
-                        if(t2 < third/2){
-                            this.map.putTile(8,x,y,this.layer);
-                        }
-                        else if(t2 > third*2.9){
-                            this.map.putTile(15,x,y,this.layer);
-                        }
-                    }
-                }
-            }
-        }
-    }
-	*/	
-	
-	
     this.pieProgressPie.DestroyPie();
     this.pieProgressPie = null;
 
@@ -251,6 +168,7 @@ create: function() {
     this.game_ui_group.add(this.finishTurnText);
     this.game_ui_group.add(this.currentTurnText);
     this.game_ui_group.add(this.captureStatsText);
+    this.game_ui_group.add(this.timerText);
 
     game.camera.x = 0;
     game.camera.y = 5 * 64;
@@ -276,10 +194,7 @@ create: function() {
     this.unitsGroup.createPlayerUnit(game,12,8,2);
     this.unitsGroup.createPlayerUnit(game,12,9,2);
 
-    //Enemigos
-    this.unitsGroup.createPlayerUnit(game,1,16,3);
-    this.unitsGroup.createPlayerUnit(game,11,19,4);
-
+    this.generateProcedural();
     this.processCapture();
     this.updateCurrentTurnText();
     this.updateCaptureStats();
@@ -297,7 +212,9 @@ update: function() {
     if(game.isGamepaused){
         return;
     }
-    this.timerText.setText("Tiempo restante: " + timeLeftPlayer);
+    if(this.timerText){
+        this.timerText.setText("Tiempo restante: " + timeLeftPlayer);
+    }
     
     if(timeLeftPlayer <= 0){
         this.finishTurn();
@@ -603,6 +520,83 @@ handleAttack: function(){
             }
         });
     });
+},
+generateProcedural: function(){
+    //vaciar mapa
+    /*
+    for (var y = 0; y < 20; y++)
+        for (var x = 0; x < 20; x++)        
+            this.map.putTile(1,x,y,this.layer); 
+    */
+    //crear rio
+    var t1;
+    var t2;
+    var third=1/3;
+    var seed = Math.floor((0.5-Math.random())*(2)+8);
+    var rio=4;
+    var t1=seed;
+    var anterior=t1;
+    this.map.putTile(rio,seed,0,this.layer); //inicio siempre hacia abajo
+    for (var z = 1; z < 20; z++){
+        t2=Math.random(); //dirección del rio
+        if(anterior==10){//si anterior se fue al tope derecha
+            t1=t1-1;    
+            this.map.putTile(36,t1+1,z,this.layer);
+            this.map.putTile(37,t1,z,this.layer);
+        }
+        else{
+            if(anterior==3){//si anterior se fue al tope izquierda
+                t1=t1+1;
+                this.map.putTile(29,t1-1,z,this.layer);
+                this.map.putTile(22,t1,z,this.layer);
+            }
+            else{
+                if(t2>2*third){
+                    t1=t1+1;
+                    if(t1>10) //limita movimiento a la derecha
+                        t1=10;
+                    this.map.putTile(29,t1-1,z,this.layer);
+                    this.map.putTile(22,t1,z,this.layer);
+                    if(t2>0.8)
+                        this.map.putTile(15,t1-2,z,this.layer);
+                }
+                else{
+                    if(t2<third){
+                        t1=t1-1;
+                        if(t1<3) //limita movimiento a la izquierda
+                            t1=3;
+                        this.map.putTile(36,t1+1,z,this.layer);
+                        this.map.putTile(37,t1,z,this.layer);
+                        if(t2<0.2)
+                            this.map.putTile(15,t1+2,z,this.layer);
+                    }
+                    else{
+                        this.map.putTile(rio,t1,z,this.layer);
+                    }
+                    
+                }
+            }
+        }
+    anterior=t1;    
+    }
+    
+    //codigo generacion enemigos 
+    
+    //this.unitsGroup = new UnitsGroup(game,this.map,this.layer);
+    //this.cardGroup = new CardGroup(game,this.map,this.layer,this.unitsGroup);
+    //this.unitsGroup.cardGroup = this.cardGroup;
+
+    for(var k=0; k<20; k++){
+        var rand_t=Math.random();
+        var rand_e=Math.random();
+        if(rand_e<0.1){
+            this.unitsGroup.createPlayerUnit(this.game,Math.round(rand_e)*10,k,3); //crear tigre
+        }
+        if(rand_t<0.2){
+            this.unitsGroup.createPlayerUnit(this.game,Math.round(rand_e)*10,k,4); //crear elefante
+        }
+        
+    }
 },
 processCapture: function(){
     var that = this;

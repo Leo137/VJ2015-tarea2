@@ -141,6 +141,22 @@ create: function() {
 		}
 	anterior=t1;	
 	}
+	
+	//codigo generacion enemigos 
+    
+	//this.unitsGroup = new UnitsGroup(game,this.map,this.layer);
+    //this.cardGroup = new CardGroup(game,this.map,this.layer,this.unitsGroup);
+	//this.unitsGroup.cardGroup = this.cardGroup;
+
+	for(var k=0; k<20; k++){
+		var rand_t=Math.random();
+		var rand_e=Math.random();
+		if(rand_e<0.4)
+			this.unitsGroup.createPlayerUnit(this.game,Math.round(rand_e)*10,K,4); //crear tigre
+		if(rand_t<0.4)
+			this.unitsGroup.createPlayerUnit(this.game,Math.round(rand_e)*10,K,11); //crear elefante
+		
+	}
 /*
     for (var y = 0; y < 20; y++){
         for (var x = 0; x < 15; x++){

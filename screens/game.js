@@ -653,7 +653,7 @@ actTiger: function(){
         that.unitsGroup.forEach(function(unitTiger){
             if(unitTiger.owner == 3 && unit.owner != 3){
                 //console.log(Phaser.Math.distance(unitTiger.x_/64, unit.x_/64, unitTiger.y_/64, unit.y_/64));
-                if(Math.abs(unitTiger.x_/64 - unit.x_/64) <= 1 && Math.abs(unitTiger.y_/64 - unit.y_/64) <= 1){
+                if(Math.abs(unitTiger.x_/64 - unit.x_/64) < 1 && Math.abs(unitTiger.y_/64 - unit.y_/64) < 1){
                     if(unitTiger.quantity > unit.quantity){
                         unitTiger.quantity -= unit.quantity;
                         unitTiger.updateQuantityText();
